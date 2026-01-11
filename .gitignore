@@ -1,6 +1,6 @@
 # Whisper models/files
 whisper/
-Audios/
+
 videos/
 *.whisper
 
