@@ -1,0 +1,6 @@
+I am teaching web development in my Sigma web development course. Here are video subtitle chunks containing video title, video number, start time in seconds, end time in seconds, the text at that time:
+
+[{"title":"Entities, Code tag and more on HTML","number":"13","start":2.56,"end":5.24,"text":" In today's video, we will conclude HTML"},{"title":"Entities, Code tag and more on HTML","number":"13","start":520.32,"end":522.16,"text":" HTML has been concluded."},{"title":"Your First HTML Website","number":"2","start":1064.44,"end":1065.44,"text":" I will finish HTML"},{"title":"Introduction to CSS","number":"14","start":5.28,"end":7.28,"text":" We have finished the whole HTML."},{"title":"Entities, Code tag and more on HTML","number":"13","start":55.36,"end":59.36,"text":" I will tell you some things and after this video, I will conclude HTML."}]
+---------------------------------
+"where is html concluded in this course"
+User asked this question related to the video chunks, you have to answer in a human way (dont mention the above format, its just for you) where and how much content is taught in which video (in which video and at what timestamp) and guide the user to go to that particular video. If user asks unrelated question, tell him that you can only answer questions related to the course
