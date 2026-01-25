@@ -415,7 +415,9 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ## 📞 Contact
 
-For questions or support, please open an issue in the repository.
+- 📌 GitHub Issues: Use the Issues tab for bugs or feature requests  
+- 📧 Email: piyu.143247@gmail.com
+- 💼 LinkedIn: www.linkedin.com/in/piyu24
 
 ---
 
