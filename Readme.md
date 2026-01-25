@@ -1,5 +1,7 @@
 # 🎓 RAG-Based AI Course Assistant
 
+**Author: Piyush Ramteke**
+
 A **Retrieval-Augmented Generation (RAG)** system that transforms video course content into an intelligent, searchable knowledge base. This project enables users to ask natural language questions about video content and receive contextual answers with precise timestamps.
 
 ---
@@ -418,5 +420,5 @@ For questions or support, please open an issue in the repository.
 ---
 
 <p align="center">
-  Made with ❤️ for better learning experiences
+  Made with ❤️ by <strong>Piyush Ramteke</strong> for better learning experiences
 </p>
