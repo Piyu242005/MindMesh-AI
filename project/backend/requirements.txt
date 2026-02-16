@@ -1,0 +1,12 @@
+fastapi
+uvicorn
+python-dotenv
+requests
+chromadb
+sentence-transformers
+rank-bm25
+pandas
+numpy
+scikit-learn
+joblib
+httpx
