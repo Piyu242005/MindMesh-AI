@@ -9,6 +9,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 
 from config import Config
 from utils import create_embedding
+import uuid
 
 logger = logging.getLogger("RAG.search")
 
@@ -268,6 +269,52 @@ class HybridSearchEngine:
 
         logger.info("Returning %d results for query: '%s'", len(filtered), query[:50])
         return filtered
+
+        return filtered
+
+
+    def add_documents(self, chunks: List[Dict[str, Any]]):
+        """Add new documents to the vector store and BM25 index."""
+        if not chunks:
+            return
+
+        texts = [c["text"] for c in chunks]
+        embeddings = create_embedding(texts)
+        
+        # Add to ChromaDB
+        if self.chroma_collection:
+            ids = [str(uuid.uuid4()) for _ in chunks]
+            metadatas = [
+                {
+                    "title": c.get("title", "Uploaded Doc"),
+                    "number": i,
+                    "start": 0.0,
+                    "end": 0.0
+                } for i, c in enumerate(chunks)
+            ]
+            self.chroma_collection.add(
+                documents=texts,
+                embeddings=embeddings,
+                metadatas=metadatas,
+                ids=ids
+            )
+            logger.info(f"Added {len(chunks)} chunks to ChromaDB")
+            
+        # Add to BM25 (Rebuild index - inefficient but functional for small updates)
+        # Note: If BM25 is loaded from disk, we might need to append to the existing corpus
+        # Ideally, we should persist this change. For now, in-memory update.
+        if self.bm25_data:
+            current_chunks = self.bm25_data["chunks"]
+            current_chunks.extend(chunks)
+            
+            # Rebuild BM25
+            tokenized_corpus = [doc["text"].lower().split() for doc in current_chunks]
+            self.bm25_data["bm25"] = BM25Okapi(tokenized_corpus)
+            self.bm25_data["chunks"] = current_chunks
+            
+            # Save updating index
+            # joblib.dump(self.bm25_data, "bm25_index.joblib") # Uncomment to persist
+            logger.info(f"Updated BM25 index with {len(chunks)} new chunks")
 
 
 def _chromadb_exists() -> bool:

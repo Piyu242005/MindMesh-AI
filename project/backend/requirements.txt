@@ -10,3 +10,5 @@ numpy
 scikit-learn
 joblib
 httpx
+pypdf
+python-multipart

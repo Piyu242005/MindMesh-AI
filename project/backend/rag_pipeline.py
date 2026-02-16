@@ -26,6 +26,12 @@ class RAGPipeline:
         return engine.search(query, top_k=top_k)
 
     @staticmethod
+    def add_documents(chunks: List[Dict[str, Any]]):
+        engine = RAGPipeline.get_engine()
+        engine.add_documents(chunks)
+
+
+    @staticmethod
     async def chat_stream(
         query: str, 
         model: str = Config.LLM_MODEL, 
