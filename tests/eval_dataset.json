@@ -1,0 +1,126 @@
+{
+  "description": "Evaluation dataset for RAG retrieval quality testing",
+  "version": "1.0",
+  "test_cases": [
+    {
+      "id": 1,
+      "query": "Where is HTML concluded in this course?",
+      "expected_video_numbers": ["13", "14"],
+      "expected_keywords": ["concluded", "HTML", "entities", "code tag"]
+    },
+    {
+      "id": 2,
+      "query": "How do I create my first HTML website?",
+      "expected_video_numbers": ["2"],
+      "expected_keywords": ["first", "HTML", "website"]
+    },
+    {
+      "id": 3,
+      "query": "What are heading tags in HTML?",
+      "expected_video_numbers": ["4"],
+      "expected_keywords": ["heading", "paragraph", "h1", "h2"]
+    },
+    {
+      "id": 4,
+      "query": "How to add images in HTML?",
+      "expected_video_numbers": ["5"],
+      "expected_keywords": ["image", "img", "src"]
+    },
+    {
+      "id": 5,
+      "query": "What is SEO?",
+      "expected_video_numbers": ["6"],
+      "expected_keywords": ["SEO", "search engine", "web vitals"]
+    },
+    {
+      "id": 6,
+      "query": "How to create forms in HTML?",
+      "expected_video_numbers": ["7"],
+      "expected_keywords": ["form", "input", "submit"]
+    },
+    {
+      "id": 7,
+      "query": "What are inline and block elements?",
+      "expected_video_numbers": ["8"],
+      "expected_keywords": ["inline", "block", "display"]
+    },
+    {
+      "id": 8,
+      "query": "What are classes and IDs in HTML?",
+      "expected_video_numbers": ["9"],
+      "expected_keywords": ["id", "class", "selector"]
+    },
+    {
+      "id": 9,
+      "query": "How to add video and audio in HTML?",
+      "expected_video_numbers": ["10"],
+      "expected_keywords": ["video", "audio", "media"]
+    },
+    {
+      "id": 10,
+      "query": "What are semantic tags?",
+      "expected_video_numbers": ["11"],
+      "expected_keywords": ["semantic", "header", "footer", "nav", "main"]
+    },
+    {
+      "id": 11,
+      "query": "What is CSS and how to get started?",
+      "expected_video_numbers": ["14"],
+      "expected_keywords": ["CSS", "introduction", "style"]
+    },
+    {
+      "id": 12,
+      "query": "What are CSS selectors?",
+      "expected_video_numbers": ["17"],
+      "expected_keywords": ["selector", "CSS", "class", "id"]
+    },
+    {
+      "id": 13,
+      "query": "Explain CSS box model",
+      "expected_video_numbers": ["18"],
+      "expected_keywords": ["box model", "margin", "padding", "border"]
+    },
+    {
+      "id": 14,
+      "query": "What are the different ways to include CSS?",
+      "expected_video_numbers": ["15"],
+      "expected_keywords": ["inline", "internal", "external"]
+    },
+    {
+      "id": 15,
+      "query": "How does a website work?",
+      "expected_video_numbers": ["1"],
+      "expected_keywords": ["website", "server", "browser", "VS Code"]
+    },
+    {
+      "id": 16,
+      "query": "How to create a media player in HTML?",
+      "expected_video_numbers": ["12"],
+      "expected_keywords": ["exercise", "media player", "pure HTML"]
+    },
+    {
+      "id": 17,
+      "query": "What are HTML entities?",
+      "expected_video_numbers": ["13"],
+      "expected_keywords": ["entities", "code tag", "special characters"]
+    },
+    {
+      "id": 18,
+      "query": "What is the basic structure of HTML?",
+      "expected_video_numbers": ["3"],
+      "expected_keywords": ["structure", "doctype", "head", "body"]
+    },
+    {
+      "id": 19,
+      "query": "Tell me about lists and tables",
+      "expected_video_numbers": ["5"],
+      "expected_keywords": ["list", "table", "ordered", "unordered"]
+    },
+    {
+      "id": 20,
+      "query": "What was covered in exercise 1?",
+      "expected_video_numbers": ["12", "16"],
+      "expected_keywords": ["exercise", "solution", "media player"]
+    }
+  ]
+}
