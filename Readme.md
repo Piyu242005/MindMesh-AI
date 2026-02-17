@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="https://readme-typing-svg.demolab.com?font=Fira+Code&size=32&duration=2800&pause=2000&color=7F00FF&center=true&vCenter=true&width=940&lines=🌌+Aurora+RAG+Assistant;Next-Gen+AI+Video+Course+Assistant;Powered+by+FastAPI+%2B+Ollama+%2B+ChromaDB" alt="Typing SVG" />
+<img src="https://readme-typing-svg.demolab.com?font=Outfit&weight=900&size=50&duration=3000&pause=1000&color=7F00FF&background=00000000&center=true&vCenter=true&width=1000&lines=🌌+AURORA+RAG+ASSISTANT;✨+Next-Gen+AI+Video+Knowledge+Base;🚀+Powered+by+FastAPI+%2B+Ollama" alt="Typing SVG" />
 
 <h3>
   <img src="https://img.shields.io/badge/✨-Premium_Aurora_Theme-7F00FF?style=for-the-badge" alt="Aurora Theme" />
@@ -37,24 +37,20 @@
 ### 🌟 Main Dashboard - Aurora Welcome Screen
 
 <div align="center">
-<img src="https://via.placeholder.com/1200x700/0a0e27/7F00FF?text=🌟+Aurora+Dashboard+-+Add+your+screenshot+here!+%0A%0AReplace+with:+./assets/aurora-dashboard.png" alt="Aurora Dashboard - Main Interface" width="90%" style="border-radius: 15px; box-shadow: 0 10px 40px rgba(127,0,255,0.3); margin: 20px 0;" />
+<img src="assets/aurora-dashboard.png" alt="Aurora Dashboard - Main Interface" width="90%" style="border-radius: 15px; box-shadow: 0 10px 40px rgba(127,0,255,0.3); margin: 20px 0;" />
 </div>
 
 *Beautiful gradient-based UI with glassmorphism effects and pre-built example prompts*
-
-> **📸 To add your screenshot:** Save your dashboard screenshot as `aurora-dashboard.png` in the `assets/` folder
 
 <br/>
 
 ### 💬 Interactive Chat Interface
 
 <div align="center">
-<img src="https://via.placeholder.com/1200x700/0a0e27/00D9FF?text=💬+Aurora+Chat+Interface+-+Add+your+screenshot+here!+%0A%0AReplace+with:+./assets/aurora-chat.png" alt="Aurora Chat Interface" width="90%" style="border-radius: 15px; box-shadow: 0 10px 40px rgba(0,217,255,0.3); margin: 20px 0;" />
+<img src="assets/aurora-chat.png" alt="Aurora Chat Interface" width="90%" style="border-radius: 15px; box-shadow: 0 10px 40px rgba(0,217,255,0.3); margin: 20px 0;" />
 </div>
 
 *Real-time streaming responses with context-aware answers and video timestamps*
-
-> **📸 To add your screenshot:** Save your chat screenshot as `aurora-chat.png` in the `assets/` folder
 
 </div>
 
@@ -153,18 +149,16 @@
 
 <table>
 <tr>
-<td width="50%">
+<td width="50%" valign="top">
 
 ### 🧠 **Context-Aware Intelligence**
 
 Remembers your entire conversation history for coherent, multi-turn dialogues. Ask follow-up questions naturally without repeating context.
 
-```plaintext
-✓ Multi-turn conversations
-✓ Context retention
-✓ Smart reference resolution
-✓ Conversation branching
-```
+> ✅ **Multi-turn conversations**<br/>
+> ✅ **Context retention**<br/>
+> ✅ **Smart reference resolution**<br/>
+> ✅ **Conversation branching**
 
 ---
 
@@ -172,12 +166,10 @@ Remembers your entire conversation history for coherent, multi-turn dialogues. A
 
 ChatGPT-style token-by-token streaming for instant feedback. See responses as they're generated, not after completion.
 
-```plaintext
-✓ Token streaming
-✓ Progress indicators
-✓ Stop generation control
-✓ Sub-second first token
-```
+> ⚡ **Token streaming**<br/>
+> ⚡ **Progress indicators**<br/>
+> ⚡ **Stop generation control**<br/>
+> ⚡ **Sub-second first token**
 
 ---
 
@@ -185,12 +177,10 @@ ChatGPT-style token-by-token streaming for instant feedback. See responses as th
 
 Hybrid search combining BM25 keyword matching with semantic embeddings, followed by cross-encoder reranking for maximum accuracy.
 
-```plaintext
-✓ Hybrid search (BM25 + Vector)
-✓ Cross-encoder reranking
-✓ Relevance scoring
-✓ Source attribution
-```
+> 🔍 **Hybrid search (BM25 + Vector)**<br/>
+> 🎯 **Cross-encoder reranking**<br/>
+> 📊 **Relevance scoring**<br/>
+> 📑 **Source attribution**
 
 </td>
 <td width="50%" valign="top">
@@ -201,32 +191,19 @@ Hybrid search combining BM25 keyword matching with semantic embeddings, followed
 
 ### 📊 **How Aurora Works**
 
-</div>
-
-```plaintext
-╔═══════════════════════════════════╗
-║                                   ║
-║   🎓  Your Question               ║
-║   │                               ║
-║   ├──▶ 🔍 Hybrid Search          ║
-║   │     • BM25 Keyword Match      ║
-║   │     • Semantic Similarity     ║
-║   │                               ║
-║   ├──▶ 🎯 Reranking              ║
-║   │     • Cross-Encoder Scoring   ║
-║   │     • Top-K Selection         ║
-║   │                               ║
-║   ├──▶ 🤖 LLM Generation         ║
-║   │     • Context Integration     ║
-║   │     • Token Streaming         ║
-║   │                               ║
-║   └──▶ 💬 Streaming Answer       ║
-║         • Real-time Display       ║
-║         • Source Citations        ║
-║         • 📹 Video Timestamps     ║
-║                                   ║
-╚═══════════════════════════════════╝
+```mermaid
+graph TD
+    Q[🎓 User Question] -->|Hybrid Search| S[🔍 Retrieval]
+    S -->|BM25 + Vector| R[🎯 Reranking]
+    R -->|Cross-Encoder| C[📚 Context]
+    C -->|Prompt| L[🤖 LLM Generation]
+    L -->|Stream| A[💬 Final Answer]
+    
+    style Q fill:#7F00FF,color:#fff
+    style A fill:#00D9FF,color:#fff
 ```
+
+</div>
 
 <br/>
 
@@ -236,12 +213,10 @@ Hybrid search combining BM25 keyword matching with semantic embeddings, followed
 
 Jump directly to exact timestamps in source videos. Every answer includes clickable timestamps that take you to the relevant moment.
 
-```plaintext
-✓ Precise timestamp extraction
-✓ Clickable video links
-✓ Multiple source references
-✓ Confidence scoring
-```
+> ⏱️ **Precise timestamp extraction**<br/>
+> 🔗 **Clickable video links**<br/>
+> 📽️ **Multiple source references**<br/>
+> 💯 **Confidence scoring**
 
 ---
 
@@ -249,12 +224,10 @@ Jump directly to exact timestamps in source videos. Every answer includes clicka
 
 Beautiful Aurora theme with purple-cyan gradients, glassmorphism effects, smooth animations, and dark mode optimization.
 
-```plaintext
-✓ Glassmorphism design
-✓ Smooth transitions
-✓ Typing animations
-✓ Copy to clipboard
-```
+> ✨ **Glassmorphism design**<br/>
+> 🌊 **Smooth transitions**<br/>
+> ⌨️ **Typing animations**<br/>
+> 📋 **Copy to clipboard**
 
 </td>
 </tr>
