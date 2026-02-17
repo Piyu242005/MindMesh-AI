@@ -1,11 +1,83 @@
 const API_URL = "http://localhost:8000";
 let currentSessionId = localStorage.getItem("session_id");
+let isGenerating = false;
+
+// ------------------- Helpers -------------------
+function generateSessionId() {
+    // crypto.randomUUID() can fail in some browsers / contexts (e.g. file://)
+    try {
+        if (window.crypto && typeof window.crypto.randomUUID === "function") {
+            return window.crypto.randomUUID();
+        }
+    } catch (_) { /* ignore */ }
+    return `sess-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+}
+
+function scrollToBottom() {
+    const container = document.getElementById("messages-container");
+    if (!container) return;
+    requestAnimationFrame(() => {
+        container.scrollTop = container.scrollHeight;
+    });
+}
+
+function setGenerating(next) {
+    isGenerating = next;
+    const input = document.getElementById("chat-input");
+    const sendBtn = document.getElementById("send-btn");
+    const stopBtn = document.getElementById("stop-btn");
+    const uploadBtn = document.getElementById("upload-btn");
+    const micBtn = document.getElementById("mic-btn");
+
+    if (input) input.disabled = next;
+    if (uploadBtn) uploadBtn.disabled = next;
+    if (micBtn) micBtn.disabled = next;
+
+    if (sendBtn && stopBtn) {
+        if (next) {
+            sendBtn.style.display = "none";
+            stopBtn.style.display = "flex";
+        } else {
+            stopBtn.style.display = "none";
+            sendBtn.style.display = "flex";
+            // Enable send if text exists
+            sendBtn.disabled = (document.getElementById("chat-input")?.value || "").trim() === "";
+        }
+    }
+}
+
+async function updateBackendStatus() {
+    const el = document.getElementById("backend-status");
+    if (!el) return;
+
+    const dot = el.querySelector(".dot");
+    const label = el.querySelector(".label");
+
+    try {
+        const res = await fetch(`${API_URL}/health`, { cache: "no-store" });
+        if (!res.ok) throw new Error("bad status");
+        const data = await res.json();
+        if (data?.status === "ok") {
+            el.classList.add("online");
+            el.classList.remove("offline");
+            if (label) label.textContent = "Online";
+            if (dot) dot.setAttribute("aria-label", "Online");
+            return;
+        }
+        throw new Error("unhealthy");
+    } catch (_) {
+        el.classList.add("offline");
+        el.classList.remove("online");
+        if (label) label.textContent = "Offline";
+        if (dot) dot.setAttribute("aria-label", "Offline");
+    }
+}
 
 // On Load
 document.addEventListener("DOMContentLoaded", () => {
     // Generate new session ID if not exists
     if (!currentSessionId) {
-        currentSessionId = crypto.randomUUID();
+        currentSessionId = generateSessionId();
         localStorage.setItem("session_id", currentSessionId);
     }
 
@@ -21,6 +93,10 @@ document.addEventListener("DOMContentLoaded", () => {
     // Auto-focus input
     document.getElementById("chat-input").focus();
     setupEventListeners();
+
+    // Backend status pill (non-blocking)
+    updateBackendStatus();
+    setInterval(updateBackendStatus, 5000);
 });
 
 async function loadModels() {
@@ -215,7 +291,13 @@ async function deleteSession(sessionId) {
     if (!confirm("Delete this chat?")) return;
 
     try {
-        await fetch(`${API_URL}/sessions/${sessionId}`, { method: "DELETE" });
+        const response = await fetch(`${API_URL}/sessions/${sessionId}`, { method: "DELETE" });
+        
+        if (!response.ok) {
+            throw new Error("Failed to delete session");
+        }
+
+        showToast("Chat deleted successfully", 'success');
 
         if (currentSessionId === sessionId) {
             startNewChat();
@@ -224,11 +306,12 @@ async function deleteSession(sessionId) {
         }
     } catch (e) {
         console.error("Failed to delete session", e);
+        showToast("Failed to delete chat: " + e.message, 'error');
     }
 }
 
 function startNewChat() {
-    currentSessionId = crypto.randomUUID();
+    currentSessionId = generateSessionId();
     localStorage.setItem("session_id", currentSessionId);
 
     document.getElementById("messages-container").innerHTML = "";
@@ -244,14 +327,15 @@ async function sendMessage() {
     const input = document.getElementById("chat-input");
     const text = input.value.trim();
     if (!text) return;
+    if (isGenerating) return;
+
+    console.log("🚀 sendMessage called with:", text);
 
     input.value = "";
     input.style.height = "auto";
 
     // UI Updates
-    document.getElementById("send-btn").style.display = "none";
-    const stopBtn = document.getElementById("stop-btn");
-    stopBtn.style.display = "flex";
+    setGenerating(true);
 
     // Remove welcome screen
     const welcome = document.getElementById("welcome-screen");
@@ -260,6 +344,7 @@ async function sendMessage() {
     // Add User Message
     try {
         addMessage("user", text);
+        console.log("✅ User message added");
     } catch (e) {
         console.error("Error adding user message", e);
         return;
@@ -267,22 +352,33 @@ async function sendMessage() {
 
     // Create Assistant Message Placeholder
     let assistantContentDiv;
+    let assistantMsgId;
     let cursor;
     let typingDiv;
     const messagesContainer = document.getElementById("messages-container");
 
     try {
-        const assistantMsgId = addMessage("assistant", "");
+        assistantMsgId = addMessage("assistant", "");
+        console.log("✅ Assistant message placeholder created:", assistantMsgId);
+        
         const msgEl = document.getElementById(assistantMsgId);
         if (msgEl) {
             assistantContentDiv = msgEl.querySelector(".text");
             const sourcesDiv = msgEl.querySelector(".sources-container");
             const sourcesList = msgEl.querySelector(".sources-list");
 
+            console.log("✅ Found elements:", {
+                contentDiv: !!assistantContentDiv,
+                sourcesDiv: !!sourcesDiv,
+                sourcesList: !!sourcesList
+            });
+
             // Add Cursor
             cursor = document.createElement("span");
             cursor.className = "cursor";
             assistantContentDiv.appendChild(cursor);
+        } else {
+            console.error("❌ Could not find message element with ID:", assistantMsgId);
         }
 
         // Show typing indicator
@@ -298,6 +394,7 @@ async function sendMessage() {
         messagesContainer.scrollTop = messagesContainer.scrollHeight;
 
         const selectedModel = document.getElementById("model-select").value || "llama3.2";
+        console.log("📡 Sending request to backend with model:", selectedModel);
         controller = new AbortController();
 
         const response = await fetch(`${API_URL}/chat`, {
@@ -322,41 +419,70 @@ async function sendMessage() {
         const reader = response.body.getReader();
         const decoder = new TextDecoder();
         let fullResponse = "";
+        let buffer = "";
+
+        console.log("📡 Starting stream reader...");
 
         while (true) {
             const { done, value } = await reader.read();
-            if (done) break;
+            if (done) {
+                console.log("✅ Stream reading completed");
+                break;
+            }
 
-            const chunk = decoder.decode(value);
-            const lines = chunk.split("\n\n");
+            buffer += decoder.decode(value, { stream: true });
+            const lines = buffer.split("\n");
+            
+            // Keep the last incomplete line in buffer
+            buffer = lines.pop() || "";
 
             for (const line of lines) {
+                if (!line.trim()) continue;
+
+                console.log("📦 Raw line:", line.substring(0, 100));
+
+                // Handle both SSE format (data: {...}) and plain JSON
+                let jsonStr = line;
                 if (line.startsWith("data: ")) {
-                    const dataStr = line.substring(6);
-                    if (dataStr === "[DONE]") break;
-
-                    try {
-                        const data = JSON.parse(dataStr);
-
-                        if (data.type === "content") {
-                            fullResponse += data.content;
-                            if (assistantContentDiv) {
-                                assistantContentDiv.innerHTML = marked.parse(fullResponse);
-                                if (cursor) assistantContentDiv.appendChild(cursor);
-                            }
-                            scrollToBottom();
-                        } else if (data.type === "sources") {
-                            // Re-query elements just in case
-                            const msgEl = document.getElementById(assistantMsgId);
-                            if (msgEl) {
-                                const sDiv = msgEl.querySelector(".sources-container");
-                                const sList = msgEl.querySelector(".sources-list");
-                                renderSources(data.sources, sDiv, sList);
-                            }
-                        }
-                    } catch (e) {
-                        console.error("Error parsing chunk", e, line);
+                    jsonStr = line.substring(6);
+                    if (jsonStr === "[DONE]") {
+                        console.log("🏁 Received DONE signal");
+                        break;
                     }
+                }
+
+                try {
+                    const data = JSON.parse(jsonStr);
+                    console.log("✅ Parsed data:", data.type);
+
+                    if (data.type === "content") {
+                        // Backend may send {data: "..."} OR {content: "..."} (support both)
+                        const delta = (data.data ?? data.content ?? "");
+                        fullResponse += delta;
+                        console.log("💬 Content chunk:", delta);
+                        console.log("📝 Full response so far:", fullResponse.length, "chars");
+                        
+                        if (assistantContentDiv) {
+                            assistantContentDiv.innerHTML = marked.parse(fullResponse);
+                            if (cursor) assistantContentDiv.appendChild(cursor);
+                            console.log("🖼️ Updated DOM with response");
+                        } else {
+                            console.error("❌ assistantContentDiv is null!");
+                        }
+                        scrollToBottom();
+                    } else if (data.type === "sources") {
+                        const sources = (data.data ?? data.sources ?? []);
+                        console.log("📚 Sources received:", sources?.length || 0);
+                        // Re-query elements just in case
+                        const msgEl = document.getElementById(assistantMsgId);
+                        if (msgEl) {
+                            const sDiv = msgEl.querySelector(".sources-container");
+                            const sList = msgEl.querySelector(".sources-list");
+                            renderSources(sources, sDiv, sList);
+                        }
+                    }
+                } catch (e) {
+                    console.error("❌ Error parsing chunk:", e, line.substring(0, 100));
                 }
             }
         }
@@ -374,14 +500,15 @@ async function sendMessage() {
             }
             if (cursor && cursor.parentNode) cursor.parentNode.removeChild(cursor);
         } else {
-            // If we failed before creating the bubble, show alert
-            alert("Error sending message: " + error.message);
+            // If we failed before creating the bubble, show toast
+            showToast("Error sending message: " + error.message, 'error');
         }
     } finally {
         if (typingDiv) typingDiv.remove();
         if (cursor && cursor.parentNode) cursor.parentNode.removeChild(cursor);
         scrollToBottom();
         resetInputState();
+        setGenerating(false);
         controller = null;
         loadSessions();
     }
@@ -394,10 +521,14 @@ function stopGeneration() {
 }
 
 function resetInputState() {
-    document.getElementById("send-btn").style.display = "flex";
-    document.getElementById("send-btn").disabled = true;
-    document.getElementById("stop-btn").style.display = "none";
-    document.getElementById("chat-input").focus();
+    const input = document.getElementById("chat-input");
+    const sendBtn = document.getElementById("send-btn");
+    const stopBtn = document.getElementById("stop-btn");
+
+    if (sendBtn) sendBtn.style.display = "flex";
+    if (stopBtn) stopBtn.style.display = "none";
+    if (sendBtn) sendBtn.disabled = (input?.value || "").trim() === "";
+    if (input) input.focus();
 }
 
 function addMessage(role, text, isStream = true) {
@@ -508,14 +639,51 @@ function toggleThemeInSettings(btn) {
     btn.classList.toggle('active');
 }
 
+// Show toast notification
+function showToast(message, type = 'info') {
+    const container = document.getElementById('toast-container');
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    toast.innerHTML = `
+        <div class="title">${type.charAt(0).toUpperCase() + type.slice(1)}</div>
+        <div class="msg">${message}</div>
+    `;
+    
+    container.appendChild(toast);
+    
+    // Trigger animation
+    setTimeout(() => toast.classList.add('show'), 10);
+    
+    // Remove after 3 seconds
+    setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => toast.remove(), 200);
+    }, 3000);
+}
+
 async function handleFileUpload(event) {
     const file = event.target.files[0];
     if (!file) return;
 
+    // Validate file type
+    const allowedTypes = ['text/plain', 'application/pdf', 'text/markdown'];
+    if (!allowedTypes.includes(file.type) && !file.name.endsWith('.txt') && !file.name.endsWith('.pdf') && !file.name.endsWith('.md')) {
+        showToast('Please upload a valid file type (TXT, PDF, or MD)', 'error');
+        event.target.value = "";
+        return;
+    }
+
+    // Validate file size (10MB limit)
+    if (file.size > 10 * 1024 * 1024) {
+        showToast('File size must be less than 10MB', 'error');
+        event.target.value = "";
+        return;
+    }
+
     const formData = new FormData();
     formData.append("file", file);
 
-    // Show loading state (simple toast or log)
+    // Show loading state
     const btn = document.getElementById("upload-btn");
     const originalContent = btn.innerHTML;
     btn.innerHTML = "⏳";
@@ -533,15 +701,15 @@ async function handleFileUpload(event) {
         }
 
         const data = await response.json();
-        alert(`Successfully uploaded and indexed ${data.filename} (${data.chunks_added} chunks)`);
+        showToast(`Successfully uploaded ${data.filename} (${data.chunks_added} chunks indexed)`, 'success');
 
     } catch (e) {
         console.error(e);
-        alert("Upload failed: " + e.message);
+        showToast("Upload failed: " + e.message, 'error');
     } finally {
         btn.innerHTML = originalContent;
         btn.disabled = false;
-        event.target.value = ""; // Request reset
+        event.target.value = ""; // Reset input
     }
 }
 
@@ -580,7 +748,7 @@ if ('webkitSpeechRecognition' in window) {
 
 function toggleVoice() {
     if (!recognition) {
-        alert("Speech recognition not supported in this browser.");
+        showToast("Speech recognition not supported in this browser.", 'error');
         return;
     }
 

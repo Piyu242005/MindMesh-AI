@@ -672,6 +672,37 @@ body.light-theme::after {
     gap: 15px;
 }
 
+/* Header: backend status pill */
+.backend-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 10px;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    background: rgba(255, 255, 255, 0.06);
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 12px;
+    user-select: none;
+}
+
+.backend-status .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #ef4444; /* offline red */
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15);
+}
+
+.backend-status.online .dot {
+    background: #22c55e; /* online green */
+    box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.15);
+}
+
+.backend-status .label {
+    opacity: 0.9;
+}
+
 .theme-toggle-btn,
 .settings-btn {
     background: transparent;

@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>RAG Chat Test</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        button {
+            background: #4CAF50;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover { background: #45a049; }
+        #output {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f9f9f9;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            white-space: pre-wrap;
+            font-family: monospace;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .success { color: #4CAF50; }
+        .error { color: #f44336; }
+        .info { color: #2196F3; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 RAG Chat System Test</h1>
+        <p>This test page helps diagnose chat response issues.</p>
+        
+        <div style="margin: 20px 0;">
+            <input type="text" id="question-input" placeholder="Ask a question..." 
+                   style="width: 70%; padding: 10px; font-size: 16px; border: 2px solid #ddd; border-radius: 5px;">
+            <button onclick="testChat()" style="width: 25%; padding: 10px;">🚀 Send</button>
+        </div>
+        
+        <div id="output"></div>
+        
+        <div id="response" style="margin-top: 20px; padding: 15px; background: #e3f2fd; border-radius: 5px; display: none;">
+            <h3>💬 AI Response:</h3>
+            <div id="response-text" style="white-space: pre-wrap; line-height: 1.6;"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = "http://localhost:8000";
+        const output = document.getElementById('output');
+
+        function log(message, type = 'info') {
+            const className = type === 'success' ? 'success' : type === 'error' ? 'error' : 'info';
+            output.innerHTML += `<div class="${className}">${new Date().toLocaleTimeString()} - ${message}</div>`;
+            output.scrollTop = output.scrollHeight;
+        }
+
+        async function testChat() {
+            const questionInput = document.getElementById('question-input');
+            const question = questionInput.value.trim() || "WHERE IS CSS TAUGHT";
+            
+            output.innerHTML = '';
+            document.getElementById('response').style.display = 'none';
+            document.getElementById('response-text').textContent = '';
+            
+            log('🧪 Starting chat test...', 'info');
+            log('❓ Question: "' + question + '"', 'info');
+            
+            try {
+                log('📡 Sending request to ' + API_URL + '/chat', 'info');
+                
+                const response = await fetch(`${API_URL}/chat`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        query: question,
+                        session_id: "test-" + Date.now(),
+                        model: "llama3.2"
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                log('✅ Connection established, streaming response...', 'success');
+
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder();
+                let buffer = "";
+                let chunkCount = 0;
+                let fullResponse = "";
+
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+
+                    buffer += decoder.decode(value, { stream: true });
+                    const lines = buffer.split("\n");
+                    buffer = lines.pop() || "";
+
+                    for (const line of lines) {
+                        if (!line.trim()) continue;
+                        chunkCount++;
+
+                        let jsonStr = line;
+                        if (line.startsWith("data: ")) {
+                            jsonStr = line.substring(6);
+                            if (jsonStr === "[DONE]") {
+                                log('🏁 Stream completed', 'success');
+                                break;
+                            }
+                        }
+
+                        try {
+                            const data = JSON.parse(jsonStr);
+                            
+                            if (data.type === "sources") {
+                                log(`📚 Sources received: ${data.data.length} sources`, 'success');
+                            } else if (data.type === "content") {
+                                fullResponse += data.data;
+                                log(`📝 Content chunk #${chunkCount}: "${data.data}"`, 'info');
+                            }
+                        } catch (e) {
+                            log(`❌ JSON parse error: ${e.message}`, 'error');
+                            log(`Raw line: ${line}`, 'error');
+                        }
+                    }
+                }
+
+                log('━━━━━━━━━━━━━━━━━━━━', 'info');
+                log(`✅ TEST PASSED!`, 'success');
+                log(`📊 Chunks received: ${chunkCount}`, 'success');
+                log(`💬 Full response length: ${fullResponse.length} characters`, 'success');
+                log('━━━━━━━━━━━━━━━━━━━━', 'info');
+                
+                // Display the full response
+                const responseDiv = document.getElementById('response');
+                const responseText = document.getElementById('response-text');
+                responseDiv.style.display = 'block';
+                responseText.textContent = fullResponse;
+                
+                log(`Response preview:\n${fullResponse.substring(0, 200)}...`, 'info');
+                
+            } catch (error) {
+                log('━━━━━━━━━━━━━━━━━━━━', 'error');
+                log(`❌ TEST FAILED: ${error.message}`, 'error');
+                log(`Stack: ${error.stack}`, 'error');
+            }
+        }
+
+        // Auto-run test on load
+        window.onload = () => {
+            log('✅ Test page loaded successfully', 'success');
+            log('ℹ️  Backend should be running on ' + API_URL, 'info');
+            log('ℹ️  Click the button to start testing', 'info');
+        };
+    </script>
+</body>
+</html>

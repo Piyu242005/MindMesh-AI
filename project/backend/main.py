@@ -91,11 +91,13 @@ async def chat(request: ChatRequest):
                 if event_type == "content":
                     text_chunk = chunk_data.get("data", "")
                     combined_response += text_chunk
-                    yield f"data: {json.dumps({'type': 'content', 'content': text_chunk})}\n\n"
+                    # Send both "content" and legacy "data" fields for frontend compatibility
+                    yield f"data: {json.dumps({'type': 'content', 'content': text_chunk, 'data': text_chunk})}\n\n"
                     
                 elif event_type == "sources":
                     sources = chunk_data.get("data", [])
-                    yield f"data: {json.dumps({'type': 'sources', 'sources': sources})}\n\n"
+                    # Send both "sources" and legacy "data" fields for frontend compatibility
+                    yield f"data: {json.dumps({'type': 'sources', 'sources': sources, 'data': sources})}\n\n"
             
             # Save assistant response to history
             save_message(session_id, "assistant", combined_response)

@@ -43,6 +43,10 @@
                         </select>
                     </div>
                     <div class="header-controls">
+                        <div class="backend-status" id="backend-status" title="Backend status">
+                            <span class="dot"></span>
+                            <span class="label">Offline</span>
+                        </div>
                         <button class="theme-toggle-btn" onclick="toggleTheme()" title="Switch Theme">
                             <span class="icon">☀️</span>
                         </button>
@@ -56,19 +60,23 @@
                         <div class="logo">🎓</div>
                         <h1>How can I help you today?</h1>
                         <div class="suggestions-grid">
-                            <button class="suggestion-card" onclick="setInput('Where is HTML concluded?')">
+                            <button class="suggestion-card" onclick="setInput('Where is HTML concluded?')" 
+                                aria-label="Ask where HTML is concluded">
                                 <div class="suggestion-title">HTML Support</div>
                                 <div class="suggestion-text">Where is HTML concluded?</div>
                             </button>
-                            <button class="suggestion-card" onclick="setInput('How to create forms?')">
+                            <button class="suggestion-card" onclick="setInput('How to create forms?')"
+                                    aria-label="Ask how to create forms">
                                 <div class="suggestion-title">Web Forms</div>
                                 <div class="suggestion-text">How to create forms?</div>
                             </button>
-                            <button class="suggestion-card" onclick="setInput('CSS Box Model explained')">
+                            <button class="suggestion-card" onclick="setInput('CSS Box Model explained')"
+                                    aria-label="Ask about CSS Box Model">
                                 <div class="suggestion-title">CSS Layout</div>
                                 <div class="suggestion-text">Explain the Box Model</div>
                             </button>
-                            <button class="suggestion-card" onclick="setInput('What are semantic tags?')">
+                            <button class="suggestion-card" onclick="setInput('What are semantic tags?')"
+                                    aria-label="Ask about semantic HTML tags">
                                 <div class="suggestion-title">Semantic HTML</div>
                                 <div class="suggestion-text">What are semantic tags?</div>
                             </button>
@@ -187,6 +195,9 @@
             <div class="avatar"></div>
             <div class="content">
                 <div class="text"></div>
+                <div class="message-actions">
+                    <button class="copy-btn" type="button" title="Copy to clipboard">Copy</button>
+                </div>
                 <div class="sources-container" style="display: none;">
                     <div class="sources-header">Sources</div>
                     <div class="sources-list"></div>
@@ -194,6 +205,8 @@
             </div>
         </div>
     </template>
+
+    <div id="toast-container" class="toast-container" aria-live="polite" aria-relevant="additions"></div>
 
     <script src="script.js"></script>
 </body>

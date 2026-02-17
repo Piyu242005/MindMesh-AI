@@ -1,11 +1,85 @@
 const API_URL = "http://localhost:8001/api/v1";
 let currentSessionId = localStorage.getItem("session_id");
+let isGenerating = false;
+
+// ------------------- Helpers -------------------
+function generateSessionId() {
+    try {
+        if (window.crypto && typeof window.crypto.randomUUID === "function") {
+            return window.crypto.randomUUID();
+        }
+    } catch (_) { /* ignore */ }
+    return `sess-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+}
+
+function scrollToBottom() {
+    const container = document.getElementById("messages-container");
+    if (!container) return;
+    requestAnimationFrame(() => {
+        container.scrollTop = container.scrollHeight;
+    });
+}
+
+function apiBaseUrl() {
+    return API_URL.replace(/\/api\/v1\/?$/, "");
+}
+
+function setGenerating(next) {
+    isGenerating = next;
+    const input = document.getElementById("chat-input");
+    const sendBtn = document.getElementById("send-btn");
+    const stopBtn = document.getElementById("stop-btn");
+    const uploadBtn = document.getElementById("upload-btn");
+    const micBtn = document.getElementById("mic-btn");
+
+    if (input) input.disabled = next;
+    if (uploadBtn) uploadBtn.disabled = next;
+    if (micBtn) micBtn.disabled = next;
+
+    if (sendBtn && stopBtn) {
+        if (next) {
+            sendBtn.style.display = "none";
+            stopBtn.style.display = "flex";
+        } else {
+            stopBtn.style.display = "none";
+            sendBtn.style.display = "flex";
+            sendBtn.disabled = (document.getElementById("chat-input")?.value || "").trim() === "";
+        }
+    }
+}
+
+async function updateBackendStatus() {
+    const el = document.getElementById("backend-status");
+    if (!el) return;
+
+    const dot = el.querySelector(".dot");
+    const label = el.querySelector(".label");
+
+    try {
+        const res = await fetch(`${apiBaseUrl()}/health`, { cache: "no-store" });
+        if (!res.ok) throw new Error("bad status");
+        const data = await res.json();
+        if (data?.status === "ok") {
+            el.classList.add("online");
+            el.classList.remove("offline");
+            if (label) label.textContent = "Online";
+            if (dot) dot.setAttribute("aria-label", "Online");
+            return;
+        }
+        throw new Error("unhealthy");
+    } catch (_) {
+        el.classList.add("offline");
+        el.classList.remove("online");
+        if (label) label.textContent = "Offline";
+        if (dot) dot.setAttribute("aria-label", "Offline");
+    }
+}
 
 // On Load
 document.addEventListener("DOMContentLoaded", () => {
     // Generate new session ID if not exists
     if (!currentSessionId) {
-        currentSessionId = crypto.randomUUID();
+        currentSessionId = generateSessionId();
         localStorage.setItem("session_id", currentSessionId);
     }
 
@@ -21,6 +95,10 @@ document.addEventListener("DOMContentLoaded", () => {
     // Auto-focus input
     document.getElementById("chat-input").focus();
     setupEventListeners();
+
+    // Backend status pill (non-blocking)
+    updateBackendStatus();
+    setInterval(updateBackendStatus, 5000);
 });
 
 async function loadModels() {
@@ -228,7 +306,7 @@ async function deleteSession(sessionId) {
 }
 
 function startNewChat() {
-    currentSessionId = crypto.randomUUID();
+    currentSessionId = generateSessionId();
     localStorage.setItem("session_id", currentSessionId);
 
     document.getElementById("messages-container").innerHTML = "";
@@ -244,14 +322,13 @@ async function sendMessage() {
     const input = document.getElementById("chat-input");
     const text = input.value.trim();
     if (!text) return;
+    if (isGenerating) return;
 
     input.value = "";
     input.style.height = "auto";
 
     // UI Updates
-    document.getElementById("send-btn").style.display = "none";
-    const stopBtn = document.getElementById("stop-btn");
-    stopBtn.style.display = "flex";
+    setGenerating(true);
 
     // Remove welcome screen
     const welcome = document.getElementById("welcome-screen");
@@ -322,41 +399,46 @@ async function sendMessage() {
         const reader = response.body.getReader();
         const decoder = new TextDecoder();
         let fullResponse = "";
+        let buffer = "";
 
         while (true) {
             const { done, value } = await reader.read();
             if (done) break;
 
-            const chunk = decoder.decode(value);
-            const lines = chunk.split("\n\n");
+            buffer += decoder.decode(value, { stream: true });
+            const lines = buffer.split("\n");
+            buffer = lines.pop() || "";
 
-            for (const line of lines) {
-                if (line.startsWith("data: ")) {
-                    const dataStr = line.substring(6);
-                    if (dataStr === "[DONE]") break;
+            for (const rawLine of lines) {
+                const line = rawLine.trim();
+                if (!line) continue;
 
-                    try {
-                        const data = JSON.parse(dataStr);
+                // Accept both SSE "data: {...}" and plain JSON lines
+                let jsonStr = line.startsWith("data: ") ? line.slice(6) : line;
+                if (jsonStr === "[DONE]") break;
 
-                        if (data.type === "content") {
-                            fullResponse += data.content;
-                            if (assistantContentDiv) {
-                                assistantContentDiv.innerHTML = marked.parse(fullResponse);
-                                if (cursor) assistantContentDiv.appendChild(cursor);
-                            }
-                            scrollToBottom();
-                        } else if (data.type === "sources") {
-                            // Re-query elements just in case
-                            const msgEl = document.getElementById(assistantMsgId);
-                            if (msgEl) {
-                                const sDiv = msgEl.querySelector(".sources-container");
-                                const sList = msgEl.querySelector(".sources-list");
-                                renderSources(data.sources, sDiv, sList);
-                            }
+                try {
+                    const data = JSON.parse(jsonStr);
+
+                    if (data.type === "content") {
+                        const delta = (data.data ?? data.content ?? "");
+                        fullResponse += delta;
+                        if (assistantContentDiv) {
+                            assistantContentDiv.innerHTML = marked.parse(fullResponse);
+                            if (cursor) assistantContentDiv.appendChild(cursor);
                         }
-                    } catch (e) {
-                        console.error("Error parsing chunk", e, line);
+                        scrollToBottom();
+                    } else if (data.type === "sources") {
+                        const sources = (data.data ?? data.sources ?? []);
+                        const msgEl = document.getElementById(assistantMsgId);
+                        if (msgEl) {
+                            const sDiv = msgEl.querySelector(".sources-container");
+                            const sList = msgEl.querySelector(".sources-list");
+                            renderSources(sources, sDiv, sList);
+                        }
                     }
+                } catch (e) {
+                    console.error("Error parsing chunk", e, jsonStr);
                 }
             }
         }
@@ -382,6 +464,7 @@ async function sendMessage() {
         if (cursor && cursor.parentNode) cursor.parentNode.removeChild(cursor);
         scrollToBottom();
         resetInputState();
+        setGenerating(false);
         controller = null;
         loadSessions();
     }
@@ -394,10 +477,14 @@ function stopGeneration() {
 }
 
 function resetInputState() {
-    document.getElementById("send-btn").style.display = "flex";
-    document.getElementById("send-btn").disabled = true;
-    document.getElementById("stop-btn").style.display = "none";
-    document.getElementById("chat-input").focus();
+    const input = document.getElementById("chat-input");
+    const sendBtn = document.getElementById("send-btn");
+    const stopBtn = document.getElementById("stop-btn");
+
+    if (sendBtn) sendBtn.style.display = "flex";
+    if (stopBtn) stopBtn.style.display = "none";
+    if (sendBtn) sendBtn.disabled = (input?.value || "").trim() === "";
+    if (input) input.focus();
 }
 
 function addMessage(role, text, isStream = true) {
