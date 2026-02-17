@@ -42,7 +42,7 @@ class Config:
     
     # Files inside backend directory
     EMBEDDINGS_FILE = os.getenv("EMBEDDINGS_FILE", os.path.join(_BACKEND_DIR, "embeddings.joblib"))
-
+    BM25_INDEX_FILE = os.getenv("BM25_INDEX_FILE", os.path.join(_BACKEND_DIR, "bm25_index.joblib"))
 
     # Server
     STREAMLIT_PORT = int(os.getenv("STREAMLIT_PORT", "8501"))

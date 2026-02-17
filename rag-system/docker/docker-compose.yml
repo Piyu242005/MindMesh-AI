@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    ports:
+      - "8000:8000"
+    volumes:
+      - ../data:/app/data
+      - ../backend:/app
+    environment:
+      - CHROMA_DB_DIR=/app/data/chroma_db
+      - OLLAMA_BASE_URL=http://host.docker.internal:11434
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  # Frontend server (Simple Python HTTP server for now, or Nginx)
+  frontend:
+    image: python:3.11-slim
+    working_dir: /app
+    volumes:
+      - ../frontend:/app
+    command: python -m http.server 8080
+    ports:
+      - "8080:8080"

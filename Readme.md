@@ -64,7 +64,17 @@
 
 ---
 
-## 🚀 Quick Start
+## �️ Technology Stack
+
+- **Frontend**: `HTML5`, `CSS3`, `Vanilla JS`
+- **Backend**: `Python 3.14`, `FastAPI`
+- **AI Engine**: `Ollama (Llama 3.2)`, `Sentence-Transformers`
+- **Vector DB**: `ChromaDB`
+- **Search**: `Rank-BM25`, `Cosine Similarity`
+
+---
+
+## �🚀 Quick Start
 
 ### Prerequisites
 - **Python 3.8+**

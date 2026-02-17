@@ -7,8 +7,8 @@ import pandas as pd
 from typing import List, Dict, Any, Optional, Tuple
 from sklearn.metrics.pairwise import cosine_similarity
 
-from config import Config
-from utils import create_embedding
+from .config import Config
+from .utils import create_embedding
 import uuid
 
 logger = logging.getLogger("RAG.search")
@@ -94,7 +94,7 @@ class HybridSearchEngine:
     def _load_bm25(self):
         """Load BM25 index."""
         try:
-            self.bm25_data = joblib.load("bm25_index.joblib")
+            self.bm25_data = joblib.load(Config.BM25_INDEX_FILE)
             logger.info("Loaded BM25 index with %d chunks", len(self.bm25_data["chunks"]))
         except FileNotFoundError:
             logger.info("No BM25 index found. Keyword search disabled.")

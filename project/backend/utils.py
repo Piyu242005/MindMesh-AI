@@ -7,7 +7,7 @@ import json
 import numpy as np
 import httpx
 from typing import List, Optional, Dict, Any
-from config import Config
+from .config import Config
 
 # ──────────────────────────── Logging Setup ────────────────────────────
 logging.basicConfig(

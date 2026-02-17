@@ -1,7 +1,7 @@
 """Prompt templates for the RAG pipeline with few-shot examples."""
 
 from typing import List, Dict, Any
-from utils import seconds_to_timestamp
+from .utils import seconds_to_timestamp
 
 
 FEW_SHOT_EXAMPLES = """

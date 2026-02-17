@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RAG Course Assistant</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <button class="new-chat-btn" onclick="startNewChat()">
+                    <span>+</span> New Chat
+                </button>
+            </div>
+            <div class="history-list" id="history-list">
+                <!-- History items will be injected here -->
+            </div>
+            <div class="sidebar-footer">
+                <div class="user-profile">
+                    <img src="assets/user_profile.jpg" alt="Profile" class="avatar-img">
+                    <div class="user-info">
+                        <span class="name">Piyush Ramteke</span>
+                        <span class="status">Premium User</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Chat Area -->
+        <main class="chat-area">
+            <div class="main-container">
+                <header class="chat-header">
+                    <div class="model-selector">
+                        <select id="model-select">
+                            <option value="llama3.2">Llama 3.2</option>
+                        </select>
+                    </div>
+                    <div class="header-controls">
+                        <button class="theme-toggle-btn" onclick="toggleTheme()" title="Switch Theme">
+                            <span class="icon">☀️</span>
+                        </button>
+                        <button class="settings-btn" title="Settings">⚙️</button>
+                    </div>
+                </header>
+
+                <div class="messages-container" id="messages-container">
+                    <!-- Welcome Message -->
+                    <div class="welcome-screen" id="welcome-screen">
+                        <div class="logo">🎓</div>
+                        <h1>How can I help you today?</h1>
+                        <div class="suggestions-grid">
+                            <button class="suggestion-card" onclick="setInput('Where is HTML concluded?')">
+                                <div class="suggestion-title">HTML Support</div>
+                                <div class="suggestion-text">Where is HTML concluded?</div>
+                            </button>
+                            <button class="suggestion-card" onclick="setInput('How to create forms?')">
+                                <div class="suggestion-title">Web Forms</div>
+                                <div class="suggestion-text">How to create forms?</div>
+                            </button>
+                            <button class="suggestion-card" onclick="setInput('CSS Box Model explained')">
+                                <div class="suggestion-title">CSS Layout</div>
+                                <div class="suggestion-text">Explain the Box Model</div>
+                            </button>
+                            <button class="suggestion-card" onclick="setInput('What are semantic tags?')">
+                                <div class="suggestion-title">Semantic HTML</div>
+                                <div class="suggestion-text">What are semantic tags?</div>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="input-area">
+                    <div class="input-container">
+                        <div class="input-actions-left">
+                            <button id="upload-btn" onclick="document.getElementById('file-input').click()"
+                                title="Upload Document">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path
+                                        d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"
+                                        stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                        stroke-linejoin="round" />
+                                </svg>
+                            </button>
+                            <input type="file" id="file-input" style="display: none;"
+                                onchange="handleFileUpload(event)">
+                        </div>
+                        <textarea id="chat-input" placeholder="Message RAG Assistant..." rows="1"
+                            oninput="autoResize(this)" onkeydown="handleKeyDown(event)"></textarea>
+                        <button id="mic-btn" onclick="toggleVoice()">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"
+                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round" />
+                                <path d="M19 10v2a7 7 0 01-14 0v-2M12 18.5V22M8 22h8" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                        </button>
+                        <button id="send-btn" onclick="sendMessage()" disabled>
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path d="M7 11L12 6L17 11M12 18V7" stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                        </button>
+                        <button id="stop-btn" onclick="stopGeneration()" style="display: none;">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <rect x="7" y="7" width="10" height="10" rx="1" fill="currentColor" />
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="disclaimer">
+                        AI can make mistakes. Consider checking important information.
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- User Profile Modal -->
+    <div id="user-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal('user-modal')">&times;</span>
+            <div class="modal-header">
+                <h2>User Profile</h2>
+            </div>
+            <div class="user-details">
+                <img src="assets/user_profile.jpg" alt="Profile" class="modal-avatar">
+                <h3>Piyush Ramteke</h3>
+                <p class="status-badge">Premium Plan</p>
+                <div class="stats-row">
+                    <div class="stat">
+                        <span class="value">124</span>
+                        <span class="label">Chats</span>
+                    </div>
+                    <div class="stat">
+                        <span class="value">1.2k</span>
+                        <span class="label">Messages</span>
+                    </div>
+                </div>
+                <button class="logout-btn">Log Out</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settings-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal('settings-modal')">&times;</span>
+            <div class="modal-header">
+                <h2>Settings</h2>
+            </div>
+            <div class="settings-list">
+                <div class="setting-item">
+                    <span>Dark Mode</span>
+                    <button class="toggle-switch active" onclick="toggleThemeInSettings(this)"></button>
+                </div>
+                <div class="setting-item">
+                    <span>Notifications</span>
+                    <button class="toggle-switch active"></button>
+                </div>
+                <div class="setting-item">
+                    <span>Sound Effects</span>
+                    <button class="toggle-switch"></button>
+                </div>
+                <div class="setting-divider"></div>
+                <div class="setting-info">
+                    <span>Version</span>
+                    <span>v2.4.0 (Aurora)</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Templates -->
+    <template id="message-template">
+        <div class="message">
+            <div class="avatar"></div>
+            <div class="content">
+                <div class="text"></div>
+                <div class="sources-container" style="display: none;">
+                    <div class="sources-header">Sources</div>
+                    <div class="sources-list"></div>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <script src="script.js"></script>
+</body>
+
+</html>

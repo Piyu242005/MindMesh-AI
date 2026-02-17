@@ -35,6 +35,22 @@ async def startup_event():
     # Initialize engine
     RAGPipeline.get_engine()
 
+@app.get("/")
+async def root():
+    return {
+        "name": "Aurora RAG Chat API",
+        "version": "1.0.0",
+        "status": "operational",
+        "endpoints": {
+            "health": "/health",
+            "models": "/models",
+            "chat": "/chat",
+            "sessions": "/sessions",
+            "upload": "/upload",
+            "docs": "/docs"
+        }
+    }
+
 @app.get("/sessions")
 async def list_sessions():
     return get_all_sessions()

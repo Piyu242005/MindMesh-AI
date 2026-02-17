@@ -44,30 +44,11 @@ class RAGPipeline:
         loop = asyncio.get_event_loop()
         results = await loop.run_in_executor(None, RAGPipeline.search, query)
         
-        # 2. Build Context
-        context_str = "\n\n".join(
-            [f"Source {i+1}:\n{chunk['text']}" for i, chunk in enumerate(results)]
-        )
+        # 2. Build Prompt (pass results list directly)
+        prompt = build_query_prompt(query, results)
         
-        # 3. Build Prompt
-        prompt = build_query_prompt(query, context_str)
-        
-        # 4. Yield Sources first (as a special event or just log them? 
-        # API usually sends sources at the end or in a separate field.
-        # But for streaming, we strictly yield text chunks. 
-        # We will yield a special JSON marker for sources at the end or beginning?
-        # Standard approach: Stream text, then maybe a final data chunk.
-        # Or, we return a response that contains the sources AND a stream connection.
-        # But FastAPI streaming response is one body.
-        # I'll convert everything to Server-Sent Events (SSE) format to support structured data.
-        # Or, simpler: Yield metadata as a JSON line first, then text?
-        # Let's stick to yielding text for now, and maybe send sources as the first chunk in JSON format?
-        # No, that mixes formatting.
-        # Better: The API returns the sources in the response headers? No, headers are small.
-        # Valid strategy: Return JSON chunks.
-        # Chunk 1: {"type": "sources", "data": [...]}
-        # Chunk N: {"type": "content", "data": "..."}
-        
+        # 3. Prepare sources data and stream response
+        # Return JSON chunks: {"type": "sources"} followed by {"type": "content"}
         import json
         sources_data = [
             {
