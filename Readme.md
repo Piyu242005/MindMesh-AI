@@ -36,17 +36,25 @@
 
 ### 🌟 Main Dashboard - Aurora Welcome Screen
 
-<img src="./assets/aurora-dashboard.png" alt="Aurora Dashboard - Main Interface" width="90%" style="border-radius: 15px; box-shadow: 0 10px 40px rgba(127,0,255,0.3); margin: 20px 0;" />
+<div align="center">
+<img src="https://via.placeholder.com/1200x700/0a0e27/7F00FF?text=🌟+Aurora+Dashboard+-+Add+your+screenshot+here!+%0A%0AReplace+with:+./assets/aurora-dashboard.png" alt="Aurora Dashboard - Main Interface" width="90%" style="border-radius: 15px; box-shadow: 0 10px 40px rgba(127,0,255,0.3); margin: 20px 0;" />
+</div>
 
 *Beautiful gradient-based UI with glassmorphism effects and pre-built example prompts*
+
+> **📸 To add your screenshot:** Save your dashboard screenshot as `aurora-dashboard.png` in the `assets/` folder
 
 <br/>
 
 ### 💬 Interactive Chat Interface
 
-<img src="./assets/aurora-chat.png" alt="Aurora Chat Interface" width="90%" style="border-radius: 15px; box-shadow: 0 10px 40px rgba(0,217,255,0.3); margin: 20px 0;" />
+<div align="center">
+<img src="https://via.placeholder.com/1200x700/0a0e27/00D9FF?text=💬+Aurora+Chat+Interface+-+Add+your+screenshot+here!+%0A%0AReplace+with:+./assets/aurora-chat.png" alt="Aurora Chat Interface" width="90%" style="border-radius: 15px; box-shadow: 0 10px 40px rgba(0,217,255,0.3); margin: 20px 0;" />
+</div>
 
 *Real-time streaming responses with context-aware answers and video timestamps*
+
+> **📸 To add your screenshot:** Save your chat screenshot as `aurora-chat.png` in the `assets/` folder
 
 </div>
 

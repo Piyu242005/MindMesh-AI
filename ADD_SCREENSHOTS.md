@@ -1,49 +1,66 @@
 # 📸 Screenshot Instructions
 
-## To complete the README update, please add your 2 Aurora interface screenshots:
+## ✅ Quick Fix - Add Your Screenshots in 3 Steps:
 
-### Required Screenshots:
+### Step 1: Take Screenshots
+Open your Aurora RAG application and take 2 screenshots:
+1. **Main welcome screen** (with example prompt cards)
+2. **Active chat conversation** (with questions and AI responses)
 
-1. **`aurora-dashboard.png`** - Main welcome screen with example prompts
-   - Location: `assets/aurora-dashboard.png`
-   - This should show the main interface with the gradient background and example question cards
+### Step 2: Save Screenshots
+Save/copy your 2 screenshots to the `assets/` folder with these exact names:
+- `aurora-dashboard.png` (or .jpg)
+- `aurora-chat.png` (or .jpg)
 
-2. **`aurora-chat.png`** - Active chat conversation
-   - Location: `assets/aurora-chat.png`
-   - This should show a conversation in progress with user questions and AI responses
+### Step 3: Update README (if using .jpg)
+If you saved as .jpg instead of .png, update the image extensions in README.md
 
 ---
 
-## How to Add Screenshots:
+## 🚀 Option: Use Your Existing Screenshots
 
-### Option 1: Create assets folder and add images
+If you already have the screenshots open:
+
+**Windows:**
+1. Right-click on each image → "Save image as..."
+2. Navigate to: `C:\Users\Piyu\Downloads\RAG-Based-AI\assets\`
+3. Save with the exact names:
+   - `aurora-dashboard.png`
+   - `aurora-chat.png`
+
+**Or Drag & Drop:**
+1. Open the `assets` folder in File Explorer
+2. Drag your 2 screenshots into the folder
+3. Rename them to match the required names
+
+---
+
+## 📁 Current Status
+
+Your `assets/` folder structure should look like this:
+
+```
+assets/
+├── README.md                 ✅ Exists
+├── aurora-dashboard.png      ❌ Add this
+└── aurora-chat.png          ❌ Add this
+```
+
+---
+
+## 🔄 After Adding Images
+
+Once you add the images, run:
+
 ```bash
-# Create the assets directory if it doesn't exist
-mkdir assets
+# Stage the new images
+git add assets/*.png
 
-# Copy your screenshots to the assets folder
-# Rename them to match the required names:
-# - aurora-dashboard.png (main welcome screen)
-# - aurora-chat.png (chat conversation)
+# Commit
+git commit -m "📸 Add Aurora interface screenshots"
+
+# Push to GitHub
+git push origin main
 ```
 
-### Option 2: Take new screenshots
-1. Open your Aurora RAG application
-2. Take a screenshot of the main welcome page → Save as `aurora-dashboard.png`
-3. Start a conversation and take a screenshot → Save as `aurora-chat.png`
-4. Place both images in the `assets/` folder
-
----
-
-## File Locations:
-```
-RAG-Based-AI/
-├── assets/
-│   ├── aurora-dashboard.png  ← Add this
-│   └── aurora-chat.png        ← Add this
-└── README.md
-```
-
----
-
-✅ Once you add these images, your README will display the live interface previews!
+Then your README will display the actual screenshots on GitHub! 🎉
