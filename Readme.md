@@ -64,69 +64,230 @@
 
 ## 🌟 **What is Aurora RAG?**
 
+<br/>
+
+<img src="https://img.shields.io/badge/🎯-Intelligent_Video_Course_Assistant-7F00FF?style=for-the-badge" />
+
 </div>
-
-<table>
-<tr>
-<td width="60%">
-
-**Aurora RAG** is a **production-ready** AI-powered conversational assistant that transforms your video course library into an intelligent, searchable knowledge base. Built with **FastAPI** and a stunning **Vanilla JS/CSS** frontend featuring **Glassmorphism** design.
-
-### 🎭 **Why Choose Aurora?**
-
-<blockquote>
-💡 <i>"It's not just about finding answers; it's about the experience."</i>
-</blockquote>
 
 <br/>
 
-🧠 **Context-Aware Intelligence**
-<br/>Remembers entire conversation history for coherent multi-turn dialogues
+<table>
+<tr>
+<td width="100%" align="center">
 
-⚡ **Real-Time Streaming**
-<br/>ChatGPT-style token streaming for instant feedback
+### **Aurora RAG** transforms your video course library into an **intelligent, AI-powered knowledge base**
 
-🎯 **Precision Retrieval**
-<br/>Hybrid Search (BM25 + Embeddings) + Cross-Encoder Reranking
-
-🎬 **Smart Deep Linking**
-<br/>Jump directly to exact timestamps in source videos
-
-🎨 **Premium UI/UX**
-<br/>Aurora theme with gradient effects and smooth animations
-
-</td>
-<td width="40%">
-
-```plaintext
-┌─────────────────────────┐
-│   🎓 Your Question      │
-│        ⬇️                │
-│   🔍 Hybrid Search      │
-│        ⬇️                │
-│   🎯 Reranking          │
-│        ⬇️                │
-│   🤖 LLM Generation     │
-│        ⬇️                │
-│   💬 Streaming Answer   │
-│        ⬇️                │
-│   📹 Video Timestamp    │
-└─────────────────────────┘
-```
-
-<div align="center">
-
-**⚡ Sub-Second Response Times**
-
-**🔒 100% Local & Private**
-
-**📦 Zero-Config Setup**
-
-</div>
+*Production-ready conversational assistant with stunning Glassmorphism UI*
 
 </td>
 </tr>
 </table>
+
+<br/>
+
+<table>
+<tr>
+<td width="33%" align="center">
+
+### 🏗️ **Built With**
+
+**FastAPI** Backend
+<br/>⚡ High-performance async
+
+**Vanilla JS/CSS** Frontend
+<br/>🎨 Zero dependencies
+
+**Ollama** AI Models
+<br/>🤖 Local & private
+
+</td>
+<td width="34%" align="center">
+
+### 🎯 **Core Technology**
+
+**Hybrid RAG Pipeline**
+<br/>🔍 BM25 + Embeddings
+
+**Cross-Encoder Reranking**
+<br/>🎯 Precision results
+
+**Streaming Responses**
+<br/>⚡ Real-time feedback
+
+</td>
+<td width="33%" align="center">
+
+### 💎 **Design Philosophy**
+
+**Glassmorphism UI**
+<br/>✨ Premium aesthetics
+
+**Aurora Theme**
+<br/>🌌 Purple-cyan gradients
+
+**Mobile-First**
+<br/>📱 Fully responsive
+
+</td>
+</tr>
+</table>
+
+<br/>
+
+---
+
+<div align="center">
+
+### 🎭 **Why Choose Aurora?**
+
+<br/>
+
+<blockquote align="left">
+<h4>💡 "It's not just about finding answers; it's about the experience."</h4>
+</blockquote>
+
+</div>
+
+<br/>
+
+<table>
+<tr>
+<td width="50%">
+
+### 🧠 **Context-Aware Intelligence**
+
+Remembers your entire conversation history for coherent, multi-turn dialogues. Ask follow-up questions naturally without repeating context.
+
+```plaintext
+✓ Multi-turn conversations
+✓ Context retention
+✓ Smart reference resolution
+✓ Conversation branching
+```
+
+---
+
+### ⚡ **Real-Time Streaming**
+
+ChatGPT-style token-by-token streaming for instant feedback. See responses as they're generated, not after completion.
+
+```plaintext
+✓ Token streaming
+✓ Progress indicators
+✓ Stop generation control
+✓ Sub-second first token
+```
+
+---
+
+### 🎯 **Precision Retrieval**
+
+Hybrid search combining BM25 keyword matching with semantic embeddings, followed by cross-encoder reranking for maximum accuracy.
+
+```plaintext
+✓ Hybrid search (BM25 + Vector)
+✓ Cross-encoder reranking
+✓ Relevance scoring
+✓ Source attribution
+```
+
+</td>
+<td width="50%" valign="top">
+
+<br/>
+
+<div align="center">
+
+### 📊 **How Aurora Works**
+
+</div>
+
+```plaintext
+╔═══════════════════════════════════╗
+║                                   ║
+║   🎓  Your Question               ║
+║   │                               ║
+║   ├──▶ 🔍 Hybrid Search          ║
+║   │     • BM25 Keyword Match      ║
+║   │     • Semantic Similarity     ║
+║   │                               ║
+║   ├──▶ 🎯 Reranking              ║
+║   │     • Cross-Encoder Scoring   ║
+║   │     • Top-K Selection         ║
+║   │                               ║
+║   ├──▶ 🤖 LLM Generation         ║
+║   │     • Context Integration     ║
+║   │     • Token Streaming         ║
+║   │                               ║
+║   └──▶ 💬 Streaming Answer       ║
+║         • Real-time Display       ║
+║         • Source Citations        ║
+║         • 📹 Video Timestamps     ║
+║                                   ║
+╚═══════════════════════════════════╝
+```
+
+<br/>
+
+---
+
+### 🎬 **Smart Deep Linking**
+
+Jump directly to exact timestamps in source videos. Every answer includes clickable timestamps that take you to the relevant moment.
+
+```plaintext
+✓ Precise timestamp extraction
+✓ Clickable video links
+✓ Multiple source references
+✓ Confidence scoring
+```
+
+---
+
+### 🎨 **Premium UI/UX**
+
+Beautiful Aurora theme with purple-cyan gradients, glassmorphism effects, smooth animations, and dark mode optimization.
+
+```plaintext
+✓ Glassmorphism design
+✓ Smooth transitions
+✓ Typing animations
+✓ Copy to clipboard
+```
+
+</td>
+</tr>
+</table>
+
+<br/>
+
+<div align="center">
+
+### ⚡ **Performance Highlights**
+
+<table>
+<tr>
+<td align="center" width="25%">
+<h3>~200ms</h3>
+<sub>Hybrid Search</sub>
+</td>
+<td align="center" width="25%">
+<h3>~150ms</h3>
+<sub>Reranking</sub>
+</td>
+<td align="center" width="25%">
+<h3>~500ms</h3>
+<sub>First Token</sub>
+</td>
+<td align="center" width="25%">
+<h3>100%</h3>
+<sub>Local & Private</sub>
+</td>
+</tr>
+</table>
+
+</div>
 
 ---
 
@@ -134,63 +295,238 @@
 
 ## ✨ **Core Features**
 
+<br/>
+
+*Everything you need for a premium RAG experience, out of the box*
+
 </div>
+
+<br/>
+
+### 🤖 **Intelligent Backend Architecture**
 
 <table>
 <tr>
-<td width="50%" valign="top">
+<td width="25%" valign="top">
 
-### 🤖 **Intelligent Backend**
+#### 🏗️ **FastAPI Core**
+
+**High-Performance Server**
+
+• `async/await` for high concurrency
+• Type-safe with Pydantic models
+• Auto-generated OpenAPI docs
+• CORS-enabled REST API
+• Health check endpoints
 
 <br/>
 
-🏗️ **FastAPI Core**
-<br/>• Async/await for high concurrency
-<br/>• Type-safe with Pydantic models
-<br/>• Auto-generated OpenAPI docs
-
-🧠 **Advanced RAG Pipeline**
-<br/>• Multi-stage retrieval system
-<br/>• Context-aware answer generation
-<br/>• Smart chunk selection
-
-📡 **Streaming Responses**
-<br/>• Real-time token generation
-<br/>• Newline-delimited JSON format
-<br/>• Graceful error handling
-
-💾 **Session Management**
-<br/>• SQLite-based chat history
-<br/>• Multi-session support
-<br/>• Persistent conversations
+<div align="center">
+<img src="https://img.shields.io/badge/FastAPI-009688?style=flat-square&logo=fastapi&logoColor=white" />
+</div>
 
 </td>
-<td width="50%" valign="top">
+<td width="25%" valign="top">
 
-### 🎨 **Premium Frontend**
+#### 🧠 **RAG Pipeline**
+
+**Advanced Retrieval System**
+
+• Multi-stage retrieval pipeline
+• Context-aware generation
+• Smart chunk selection
+• Prompt engineering
+• Source attribution
 
 <br/>
 
-🌌 **Aurora Theme**
-<br/>• Purple-cyan gradient palette
-<br/>• Smooth color transitions
-<br/>• Dark mode optimized
+<div align="center">
+<img src="https://img.shields.io/badge/RAG-Pipeline-7F00FF?style=flat-square" />
+</div>
 
-💎 **Glassmorphism Design**
-<br/>• Translucent card effects
-<br/>• Backdrop blur filters
-<br/>• Elevated shadows
+</td>
+<td width="25%" valign="top">
 
-📱 **Fully Responsive**
-<br/>• Mobile-first architecture
-<br/>• Adaptive layouts
-<br/>• Touch-optimized controls
+#### 📡 **Streaming**
 
-⚡ **Rich Interactions**
-<br/>• Typing animations
-<br/>• Stop generation button
-<br/>• Copy to clipboard
-<br/>• Markdown rendering
+**Real-Time Responses**
+
+• Token-by-token streaming
+• Newline-delimited JSON
+• Graceful error handling
+• Stop generation control
+• Progress feedback
+
+<br/>
+
+<div align="center">
+<img src="https://img.shields.io/badge/Streaming-Enabled-00D9FF?style=flat-square" />
+</div>
+
+</td>
+<td width="25%" valign="top">
+
+#### 💾 **Sessions**
+
+**Persistent History**
+
+• SQLite-based storage
+• Multi-session support
+• Conversation history
+• Context retention
+• Export capabilities
+
+<br/>
+
+<div align="center">
+<img src="https://img.shields.io/badge/SQLite-Database-003B57?style=flat-square&logo=sqlite" />
+</div>
+
+</td>
+</tr>
+</table>
+
+<br/>
+
+### 🎨 **Premium Frontend Experience**
+
+<table>
+<tr>
+<td width="25%" valign="top">
+
+#### 🌌 **Aurora Theme**
+
+**Stunning Visuals**
+
+• Purple-cyan gradient palette
+• Smooth color transitions
+• Dark mode optimized
+• Custom CSS variables
+• Consistent branding
+
+<br/>
+
+<div align="center">
+<img src="https://img.shields.io/badge/Theme-Aurora-7F00FF?style=flat-square" />
+</div>
+
+</td>
+<td width="25%" valign="top">
+
+#### 💎 **Glassmorphism**
+
+**Modern Design Language**
+
+• Translucent card effects
+• Backdrop blur filters
+• Elevated shadows
+• Frosted glass aesthetics
+• Layered depth
+
+<br/>
+
+<div align="center">
+<img src="https://img.shields.io/badge/Design-Glassmorphism-00D9FF?style=flat-square" />
+</div>
+
+</td>
+<td width="25%" valign="top">
+
+#### 📱 **Responsive**
+
+**Works Everywhere**
+
+• Mobile-first architecture
+• Adaptive layouts
+• Touch-optimized controls
+• Tablet support
+• Cross-browser compatible
+
+<br/>
+
+<div align="center">
+<img src="https://img.shields.io/badge/Mobile-Friendly-FFD700?style=flat-square" />
+</div>
+
+</td>
+<td width="25%" valign="top">
+
+#### ⚡ **Interactive**
+
+**Rich User Experience**
+
+• Typing animations
+• Stop generation button
+• Copy to clipboard
+• Markdown rendering
+• Syntax highlighting
+
+<br/>
+
+<div align="center">
+<img src="https://img.shields.io/badge/UX-Premium-FF6600?style=flat-square" />
+</div>
+
+</td>
+</tr>
+</table>
+
+<br/>
+
+### 🔍 **Search & Retrieval Features**
+
+<table>
+<tr>
+<td width="33%" align="center">
+
+#### **Hybrid Search**
+
+🔤 **BM25 Keyword Search**
+<br/>Traditional TF-IDF ranking
+
+➕
+
+🧮 **Semantic Vector Search**
+<br/>Deep learning embeddings
+
+=
+
+✨ **Best of Both Worlds**
+
+</td>
+<td width="34%" align="center">
+
+#### **Cross-Encoder Reranking**
+
+📊 **Initial Retrieval**
+<br/>Get top-100 candidates
+
+⬇️
+
+🎯 **Precise Scoring**
+<br/>Rerank with transformer model
+
+⬇️
+
+🏆 **Top-K Results**
+<br/>Return best 5-10 chunks
+
+</td>
+<td width="33%" align="center">
+
+#### **Source Attribution**
+
+📹 **Video References**
+<br/>Exact timestamps
+
+➕
+
+📄 **Chunk Metadata**
+<br/>Course & module info
+
+=
+
+🔗 **Clickable Links**
 
 </td>
 </tr>
