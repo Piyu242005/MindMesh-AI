@@ -689,6 +689,54 @@ body.light-theme::after {
     color: white;
 }
 
+/* ---- Mode Selector ---- */
+.mode-selector {
+    display: flex;
+    gap: 6px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid var(--glass-border);
+    border-radius: 10px;
+    padding: 4px;
+}
+
+.mode-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 0.82em;
+    font-weight: 500;
+    padding: 5px 14px;
+    border-radius: 7px;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+    white-space: nowrap;
+}
+
+.mode-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-primary);
+}
+
+.mode-btn.active {
+    background: var(--accent-primary);
+    color: #fff;
+    box-shadow: var(--accent-glow);
+}
+
+body.light-theme .mode-selector {
+    background: rgba(0, 0, 0, 0.06);
+    border-color: rgba(0, 0, 0, 0.12);
+}
+
+body.light-theme .mode-btn {
+    color: #555;
+}
+
+body.light-theme .mode-btn.active {
+    background: #6c5ce7;
+    color: #fff;
+}
+
 .header-controls {
     display: flex;
     gap: 15px;

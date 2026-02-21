@@ -35,7 +35,8 @@ class RAGPipeline:
     async def chat_stream(
         query: str, 
         model: str = Config.LLM_MODEL, 
-        use_reranker: bool = True
+        use_reranker: bool = True,
+        mode: str = "chat",
     ) -> AsyncGenerator[str, None]:
         
         # 1. Search
@@ -44,8 +45,8 @@ class RAGPipeline:
         loop = asyncio.get_event_loop()
         results = await loop.run_in_executor(None, RAGPipeline.search, query)
         
-        # 2. Build Prompt (pass results list directly)
-        prompt = build_query_prompt(query, results)
+        # 2. Build Prompt with the selected mode (chat | qa | coding)
+        prompt = build_query_prompt(query, results, mode=mode)
         
         # 3. Prepare sources data and stream response
         # Return JSON chunks: {"type": "sources"} followed by {"type": "content"}

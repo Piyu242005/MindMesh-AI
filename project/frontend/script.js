@@ -2,6 +2,33 @@ const API_URL = "http://localhost:8000";
 let currentSessionId = localStorage.getItem("session_id");
 let isGenerating = false;
 
+// ------------------- Mode Selector -------------------
+
+function setMode(mode) {
+    // Update active button
+    document.querySelectorAll(".mode-btn").forEach(btn => {
+        btn.classList.toggle("active", btn.dataset.mode === mode);
+    });
+    // Persist selection
+    localStorage.setItem("selected_mode", mode);
+
+    // Update input placeholder based on mode
+    const input = document.getElementById("chat-input");
+    if (!input) return;
+    if (mode === "qa") {
+        input.placeholder = "Ask a question...";
+    } else if (mode === "coding") {
+        input.placeholder = "Describe what code you need...";
+    } else {
+        input.placeholder = "Message RAG Assistant...";
+    }
+}
+
+function getActiveMode() {
+    const active = document.querySelector(".mode-btn.active");
+    return active ? active.dataset.mode : (localStorage.getItem("selected_mode") || "chat");
+}
+
 // ------------------- Helpers -------------------
 function generateSessionId() {
     // crypto.randomUUID() can fail in some browsers / contexts (e.g. file://)
@@ -86,6 +113,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Load available models
     loadModels();
+
+    // Restore saved mode
+    const savedMode = localStorage.getItem("selected_mode") || "chat";
+    setMode(savedMode);
 
     // Load current session history
     loadHistory(currentSessionId);
@@ -394,7 +425,8 @@ async function sendMessage() {
         messagesContainer.scrollTop = messagesContainer.scrollHeight;
 
         const selectedModel = document.getElementById("model-select").value || "llama3.2";
-        console.log("📡 Sending request to backend with model:", selectedModel);
+        const selectedMode = getActiveMode();
+        console.log("📡 Sending request to backend with model:", selectedModel, "mode:", selectedMode);
         controller = new AbortController();
 
         const response = await fetch(`${API_URL}/chat`, {
@@ -403,27 +435,30 @@ async function sendMessage() {
             body: JSON.stringify({
                 query: text,
                 session_id: currentSessionId,
-                model: selectedModel
+                model: selectedModel,
+                mode: selectedMode,
             }),
             signal: controller.signal
         });
 
         if (!response.ok) throw new Error(`Server Error: ${response.statusText}`);
 
-        // Helper to remove typing safely
-        if (typingDiv) {
-            typingDiv.remove();
-            typingDiv = null;
+        // NOTE: Do NOT remove typing indicator here — Llama may take 30-60s to generate.
+        // It will be removed when the first content token arrives.
+        // Show "Thinking..." placeholder in assistant bubble
+        if (assistantContentDiv) {
+            assistantContentDiv.innerHTML = '<em style="opacity:0.5">Thinking…</em>';
         }
 
         const reader = response.body.getReader();
         const decoder = new TextDecoder();
         let fullResponse = "";
         let buffer = "";
+        let streamDone = false;
 
         console.log("📡 Starting stream reader...");
 
-        while (true) {
+        while (!streamDone) {
             const { done, value } = await reader.read();
             if (done) {
                 console.log("✅ Stream reading completed");
@@ -432,59 +467,72 @@ async function sendMessage() {
 
             buffer += decoder.decode(value, { stream: true });
             const lines = buffer.split("\n");
-            
+
             // Keep the last incomplete line in buffer
             buffer = lines.pop() || "";
 
             for (const line of lines) {
                 if (!line.trim()) continue;
 
-                console.log("📦 Raw line:", line.substring(0, 100));
-
-                // Handle both SSE format (data: {...}) and plain JSON
+                // Handle SSE format (data: {...})
                 let jsonStr = line;
                 if (line.startsWith("data: ")) {
                     jsonStr = line.substring(6);
                     if (jsonStr === "[DONE]") {
                         console.log("🏁 Received DONE signal");
-                        break;
+                        streamDone = true;
+                        break; // exits for-loop; while condition re-checked → exits
                     }
                 }
 
                 try {
                     const data = JSON.parse(jsonStr);
-                    console.log("✅ Parsed data:", data.type);
 
                     if (data.type === "content") {
-                        // Backend may send {data: "..."} OR {content: "..."} (support both)
                         const delta = (data.data ?? data.content ?? "");
+                        if (!delta) continue;
                         fullResponse += delta;
-                        console.log("💬 Content chunk:", delta);
-                        console.log("📝 Full response so far:", fullResponse.length, "chars");
-                        
+
+                        // Remove typing indicator on first token
+                        if (typingDiv) { typingDiv.remove(); typingDiv = null; }
+
                         if (assistantContentDiv) {
-                            assistantContentDiv.innerHTML = marked.parse(fullResponse);
+                            try {
+                                assistantContentDiv.innerHTML = marked.parse(fullResponse);
+                            } catch (_) {
+                                assistantContentDiv.textContent = fullResponse;
+                            }
                             if (cursor) assistantContentDiv.appendChild(cursor);
-                            console.log("🖼️ Updated DOM with response");
-                        } else {
-                            console.error("❌ assistantContentDiv is null!");
                         }
                         scrollToBottom();
+
                     } else if (data.type === "sources") {
                         const sources = (data.data ?? data.sources ?? []);
                         console.log("📚 Sources received:", sources?.length || 0);
-                        // Re-query elements just in case
                         const msgEl = document.getElementById(assistantMsgId);
                         if (msgEl) {
                             const sDiv = msgEl.querySelector(".sources-container");
                             const sList = msgEl.querySelector(".sources-list");
                             renderSources(sources, sDiv, sList);
                         }
+
+                    } else if (data.type === "error") {
+                        if (typingDiv) { typingDiv.remove(); typingDiv = null; }
+                        if (assistantContentDiv) {
+                            assistantContentDiv.innerHTML = `<span style="color:#ef4444">⚠️ ${data.message || "Unknown error"}</span>`;
+                        }
+                        streamDone = true;
+                        break;
                     }
                 } catch (e) {
                     console.error("❌ Error parsing chunk:", e, line.substring(0, 100));
                 }
             }
+        }
+
+        // If Llama returned nothing at all, show a fallback
+        if (!fullResponse && assistantContentDiv) {
+            assistantContentDiv.innerHTML = '<span style="opacity:0.6">No response received. Check that Ollama is running and the model is loaded.</span>';
         }
 
         // Speak response

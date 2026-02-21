@@ -32,8 +32,11 @@ from .database import init_db, save_message, get_chat_history, create_session, g
 async def startup_event():
     logger.info("Starting up RAG API...")
     init_db()
-    # Initialize engine
-    RAGPipeline.get_engine()
+    # Initialize engine (non-fatal: server stays up even if embeddings aren't ready)
+    try:
+        RAGPipeline.get_engine()
+    except Exception as e:
+        logger.warning(f"Engine init failed at startup (will retry on first request): {e}")
 
 @app.get("/")
 async def root():
@@ -80,7 +83,8 @@ async def chat(request: ChatRequest):
             async for chunk_str in RAGPipeline.chat_stream(
                 query=request.query,
                 model=request.model,
-                use_reranker=request.use_reranker
+                use_reranker=request.use_reranker,
+                mode=request.mode or "chat",
             ):
                 chunk_str = chunk_str.strip()
                 if not chunk_str: continue

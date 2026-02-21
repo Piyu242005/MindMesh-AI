@@ -42,6 +42,18 @@
                             <option value="llama3.2">Llama 3.2</option>
                         </select>
                     </div>
+                    <!-- Mode Selector -->
+                    <div class="mode-selector" role="group" aria-label="Response mode">
+                        <button class="mode-btn active" data-mode="chat" onclick="setMode('chat')" title="Chat — conversational answers">
+                            💬 Chat
+                        </button>
+                        <button class="mode-btn" data-mode="qa" onclick="setMode('qa')" title="Q&amp;A — direct factual answers">
+                            ❓ Q&amp;A
+                        </button>
+                        <button class="mode-btn" data-mode="coding" onclick="setMode('coding')" title="Coding — code examples &amp; explanations">
+                            &lt;/&gt; Coding
+                        </button>
+                    </div>
                     <div class="header-controls">
                         <div class="backend-status" id="backend-status" title="Backend status">
                             <span class="dot"></span>

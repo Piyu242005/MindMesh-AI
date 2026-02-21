@@ -40,9 +40,19 @@ class Config:
     JSONS_DIR = os.getenv("JSONS_DIR", os.path.join(_ROOT_DIR, "jsons"))
     CHROMA_DB_DIR = os.getenv("CHROMA_DB_DIR", os.path.join(_ROOT_DIR, "chroma_db"))
     
-    # Files inside backend directory
-    EMBEDDINGS_FILE = os.getenv("EMBEDDINGS_FILE", os.path.join(_BACKEND_DIR, "embeddings.joblib"))
-    BM25_INDEX_FILE = os.getenv("BM25_INDEX_FILE", os.path.join(_BACKEND_DIR, "bm25_index.joblib"))
+    # Embeddings/index files — check backend dir first, then fall back to repo root
+    _DEFAULT_EMBED = (
+        os.path.join(_BACKEND_DIR, "embeddings.joblib")
+        if os.path.exists(os.path.join(_BACKEND_DIR, "embeddings.joblib"))
+        else os.path.join(_ROOT_DIR, "embeddings.joblib")
+    )
+    _DEFAULT_BM25 = (
+        os.path.join(_BACKEND_DIR, "bm25_index.joblib")
+        if os.path.exists(os.path.join(_BACKEND_DIR, "bm25_index.joblib"))
+        else os.path.join(_ROOT_DIR, "bm25_index.joblib")
+    )
+    EMBEDDINGS_FILE = os.getenv("EMBEDDINGS_FILE", _DEFAULT_EMBED)
+    BM25_INDEX_FILE = os.getenv("BM25_INDEX_FILE", _DEFAULT_BM25)
 
     # Server
     STREAMLIT_PORT = int(os.getenv("STREAMLIT_PORT", "8501"))
