@@ -237,3 +237,12 @@ with right:
 | **Phase 2** | `python validate_qdrant.py` | ⬜ Run when ready |
 | **Phase 3** | Remove joblib imports | ⬜ After Phase 2 |
     """)
+
+    st.divider()
+    st.markdown("""
+    <div style="text-align: center; color: rgba(255,255,255,0.4); padding: 20px;">
+        <h4 style="margin:0; color: rgba(255,255,255,0.6);">MindMesh AI v1.0</h4>
+        <p style="margin:5px 0;">AI-Powered Learning Intelligence</p>
+        <p style="margin:0; font-size: 0.8rem;">Built by Piyush Ramteke</p>
+    </div>
+    """, unsafe_allow_html=True)

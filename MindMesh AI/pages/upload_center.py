@@ -176,6 +176,8 @@ if submit and uploaded_files:
         st.stop()
 
     st.divider()
+    st.image("assets/logo.png", width=100)
+    st.info("MindMesh AI is processing your course...")
     st.subheader(f"🎬 Processing {len(uploaded_files)} video(s)")
 
     videos_dir = _ROOT / "videos"

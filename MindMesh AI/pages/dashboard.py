@@ -17,13 +17,18 @@ import qdrant_helper as qh
 from backend import verify_system
 from backend.embeddings import get_qdrant_client
 
-# ── Page header ───────────────────────────────────────────────────────────────
-st.markdown("""
-<div class="mm-page-header">
-  <p class="mm-page-title">📊 Dashboard</p>
-  <p class="mm-page-subtitle">System health · Qdrant Cloud · Knowledge base overview</p>
-</div>
-""", unsafe_allow_html=True)
+col_logo, col_text = st.columns([1, 6])
+with col_logo:
+    st.image("assets/logo.png", width=100)
+with col_text:
+    st.markdown("""
+    <h1 style="margin-bottom:0;">MindMesh AI</h1>
+    <h3 style="margin-top:0; color:var(--text-2);">Transform Video Courses Into Intelligent Knowledge Networks</h3>
+    <div style="color:var(--text-3); font-size:0.9rem;">
+      <b>Powered by:</b> Faster-Whisper • Qdrant Cloud • Gemini
+    </div>
+    """, unsafe_allow_html=True)
+st.divider()
 
 # ── Live Qdrant metrics ───────────────────────────────────────────────────────
 qdrant_client, qdrant_err = get_qdrant_client()

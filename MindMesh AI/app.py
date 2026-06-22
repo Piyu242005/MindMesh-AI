@@ -27,7 +27,7 @@ for _d in ["videos", "audios", "jsons"]:
 # ── Page config ───────────────────────────────────────────────────────────────
 st.set_page_config(
     page_title="MindMesh AI",
-    page_icon="🧠",
+    page_icon="assets/logo.png",
     layout="wide",
     initial_sidebar_state="expanded",
 )
@@ -94,12 +94,21 @@ _pg = st.navigation(
 
 # ── Sidebar branding (shown on every page) ────────────────────────────────────
 with st.sidebar:
+    st.logo("assets/logo.png", icon_image="assets/logo.png")
     st.markdown(
-        '<p class="mm-logo">Mind<span>Mesh</span> AI</p>',
+        '<p class="mm-logo" style="margin-bottom:0;">🧠 Mind<span>Mesh</span> AI</p>',
         unsafe_allow_html=True,
     )
-    st.caption("RAG · Qdrant · Gemini · Groq · Whisper")
+    st.caption("Transform Video Courses into Knowledge")
     st.divider()
+    
+    st.markdown(
+        """<div style="font-size:0.75rem; color:rgba(255,255,255,0.4); text-align:center;">
+        MindMesh AI v1.0<br/>
+        AI-Powered Learning Intelligence<br/>
+        Built by Piyush Ramteke
+        </div>""", unsafe_allow_html=True
+    )
 
 # ── Run selected page ─────────────────────────────────────────────────────────
 _pg.run()

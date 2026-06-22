@@ -1,8 +1,12 @@
 <div align="center">
+  <img src="MindMesh AI/assets/logo.png" width="180">
 
-<img src="https://readme-typing-svg.demolab.com?font=Inter&weight=600&size=40&pause=1000&color=7F00FF&center=true&vCenter=true&width=800&lines=MINDMESH+AI;Enterprise+Video+RAG;Autonomous+Knowledge+Base" alt="Typing SVG" />
+  <h1>MindMesh AI</h1>
 
-# MindMesh AI
+  <p>
+    Transform Video Courses into Intelligent Knowledge Networks
+  </p>
+</div>
 
 **Enterprise Video RAG & Autonomous Knowledge Base Platform**
 

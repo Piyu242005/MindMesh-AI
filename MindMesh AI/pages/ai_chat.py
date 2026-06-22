@@ -19,12 +19,16 @@ from backend import retrieval as ret
 import qdrant_helper as qh
 
 # ── Page header ───────────────────────────────────────────────────────────────
-st.markdown("""
-<div class="mm-page-header">
-  <p class="mm-page-title">💬 AI Chat</p>
-  <p class="mm-page-subtitle">Ask anything about your course — powered by Qdrant + Ollama RAG</p>
-</div>
-""", unsafe_allow_html=True)
+col_logo, col_title = st.columns([1, 8])
+with col_logo:
+    st.image("assets/logo.png", width=60)
+with col_title:
+    st.markdown("""
+    <div class="mm-page-header" style="border-bottom:none; margin-bottom:0; padding-bottom:0;">
+      <p class="mm-page-title" style="font-size:1.5rem;">AI Chat</p>
+      <p class="mm-page-subtitle">Ask anything about your course — powered by Qdrant + RAG</p>
+    </div>
+    """, unsafe_allow_html=True)
 
 # ── Load cached resources ─────────────────────────────────────────────────────
 qdrant_client, qdrant_err = get_qdrant_client()
@@ -73,8 +77,17 @@ if not is_up:
     st.warning(f"⚠️ {provider.capitalize()} is offline or missing API key. Responses will fail.")
 
 # ── Chat history ──────────────────────────────────────────────────────────────
+if not st.session_state.chat_history:
+    st.markdown("<br><br>", unsafe_allow_html=True)
+    c1, c2, c3 = st.columns([1,2,1])
+    with c2:
+        st.image("assets/logo.png", width=120)
+        st.markdown("### Welcome to MindMesh AI")
+        st.caption("Ask anything about your courses.")
+    st.markdown("<br><br>", unsafe_allow_html=True)
+
 for msg in st.session_state.chat_history:
-    with st.chat_message(msg["role"], avatar="🧑" if msg["role"] == "user" else "🧠"):
+    with st.chat_message(msg["role"], avatar="🧑" if msg["role"] == "user" else "assets/logo.png"):
         st.markdown(msg["content"])
         if msg.get("sources"):
             with st.expander(f"📚 {len(msg['sources'])} source chunk(s) · via {msg.get('retrieval_source','Qdrant')}", expanded=False):
@@ -119,7 +132,7 @@ if user_query:
     if not hits:
         answer = ("I couldn't find relevant content for that question. "
                   "Try rephrasing it, or make sure the course videos have been indexed.")
-        with st.chat_message("assistant", avatar="🧠"):
+        with st.chat_message("assistant", avatar="assets/logo.png"):
             st.markdown(answer)
         st.session_state.chat_history.append({
             "role": "assistant", "content": answer,
@@ -130,7 +143,7 @@ if user_query:
         ret.save_artifacts(prompt, "", _ROOT)
 
         # Stream response
-        with st.chat_message("assistant", avatar="🧠"):
+        with st.chat_message("assistant", avatar="assets/logo.png"):
             t1 = time.time()
             full_response = st.write_stream(
                 ret.stream_response(prompt, model_name=active_model, provider=provider)

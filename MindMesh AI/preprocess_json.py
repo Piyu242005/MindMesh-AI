@@ -35,7 +35,7 @@ print("  MindMesh AI — Preprocessing Pipeline")
 print("=" * 55)
 print("\n[1/4] Loading embedding model (BAAI/bge-small-en-v1.5)…")
 _model = SentenceTransformer("BAAI/bge-small-en-v1.5")
-print("      Model loaded ✓")
+print("      Model loaded [OK]")
 
 
 # ── Connect to Qdrant ─────────────────────────────────────────────────────────
@@ -45,9 +45,9 @@ try:
     qdrant_client = qh.get_client()
     created = qh.ensure_collection(qdrant_client)
     if created:
-        print(f"      Collection '{qh.QDRANT_COLLECTION}' created ✓")
+        print(f"      Collection '{qh.QDRANT_COLLECTION}' created [OK]")
     else:
-        print(f"      Collection '{qh.QDRANT_COLLECTION}' already exists ✓")
+        print(f"      Collection '{qh.QDRANT_COLLECTION}' already exists [OK]")
 except Exception as e:
     print(f"      [WARN] Qdrant unavailable: {e}")
     print("      Continuing in joblib-only mode (Phase 1 fallback).")
@@ -81,7 +81,7 @@ for json_file in json_files:
         })
         chunk_id += 1
 
-print(f"      {len(all_texts)} chunks across {len(json_files)} files ✓")
+print(f"      {len(all_texts)} chunks across {len(json_files)} files [OK]")
 
 
 # ── Generate embeddings in batches ────────────────────────────────────────────
@@ -93,7 +93,7 @@ raw_embeddings = _model.encode(
     normalize_embeddings=True,   # ensures cosine sim = dot product
 )
 embeddings: list[list[float]] = raw_embeddings.tolist()
-print(f"      {len(embeddings)} embeddings generated (dim={len(embeddings[0])}) ✓")
+print(f"      {len(embeddings)} embeddings generated (dim={len(embeddings[0])}) [OK]")
 
 
 # ── Upload to Qdrant ──────────────────────────────────────────────────────────
@@ -111,11 +111,11 @@ if qdrant_client is not None:
 
     def _progress(done: int, total: int) -> None:
         pct = int(done / total * 100)
-        bar = "█" * (pct // 5) + "░" * (20 - pct // 5)
+        bar = "#" * (pct // 5) + "-" * (20 - pct // 5)
         print(f"  [{bar}] {done}/{total} ({pct}%)", end="\r", flush=True)
 
     total_uploaded = qh.upload_points_batch(qdrant_client, points, on_progress=_progress)
-    print(f"\n  ✓ {total_uploaded} vectors uploaded to '{qh.QDRANT_COLLECTION}'")
+    print(f"\n  [OK] {total_uploaded} vectors uploaded to '{qh.QDRANT_COLLECTION}'")
 else:
     print("\n[Qdrant] Skipped — client unavailable.")
 
@@ -131,7 +131,7 @@ for meta, emb in zip(all_metas, embeddings):
 
 df = pd.DataFrame.from_records(records)
 joblib.dump(df, "embeddings.joblib")
-print(f"  ✓ embeddings.joblib saved ({len(df)} rows)")
+print(f"  [OK] embeddings.joblib saved ({len(df)} rows)")
 # ── End Phase 1 fallback ──────────────────────────────────────────────────────
 
 
@@ -141,6 +141,6 @@ print("  Preprocessing Complete")
 print("=" * 55)
 print(f"  Chunks indexed   : {len(all_texts)}")
 print(f"  Files processed  : {len(json_files)}")
-print(f"  Qdrant upload    : {'✓ done' if qdrant_client else '✗ skipped (offline)'}")
-print(f"  Joblib fallback  : ✓ saved")
+print(f"  Qdrant upload    : {'[OK] done' if qdrant_client else '[ERR] skipped (offline)'}")
+print(f"  Joblib fallback  : [OK] saved")
 print("=" * 55)
