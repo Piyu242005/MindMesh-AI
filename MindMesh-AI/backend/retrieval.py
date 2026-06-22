@@ -126,112 +126,190 @@ Original Query: {query}"""
     except Exception:
         return query
 
+def is_current_event(query: str) -> bool:
+    keywords = ["today", "latest", "recent", "news", "current", "2026", "2025", "now"]
+    q_lower = query.lower()
+    return any(k in q_lower for k in keywords)
+
 def retrieve(
     embed_model,
     query: str,
     qdrant_client,
     top_k: int = 5,
     score_threshold: float = 0.0,
-) -> Tuple[List[Dict[str, Any]], str, str]:
+) -> dict:
     """
     Primary retrieval: try Qdrant, fall back to joblib.
-    Uses CrossEncoder reranking.
-    Returns (hits, source_label, confidence).
+    Uses CrossEncoder reranking and Smart Web Search Mode.
+    Returns: {"course_hits": [], "web_hits": [], "confidence": str, "label": str}
     """
     from backend.embeddings import embed_single
+    from backend.web_search import search_web
 
-    vec = embed_single(query, embed_model)
+    # Read Web Search Mode (smart, course, hybrid, web)
+    mode = os.getenv("WEB_SEARCH_MODE", "smart").lower()
     
-    # Increase initial retrieval to top 20
-    initial_k = 20
+    course_hits = []
+    web_hits = []
+    confidence = "Low"
+    label = "📚 Course Knowledge"
+    
+    # 1. Course Retrieval
+    if mode in ["smart", "course", "hybrid"]:
+        vec = embed_single(query, embed_model)
+        initial_k = 20
 
-    if qdrant_client is not None:
-        try:
-            hits = retrieve_from_qdrant(qdrant_client, vec, initial_k, score_threshold)
-            source_label = "Qdrant Cloud"
-        except Exception:
-            hits, ok = retrieve_from_joblib(vec, initial_k)
-            source_label = "Local (joblib)" if ok else "No data source"
-    else:
-        hits, ok = retrieve_from_joblib(vec, initial_k)
-        source_label = "Local (joblib)" if ok else "No data source"
+        if qdrant_client is not None:
+            try:
+                course_hits = retrieve_from_qdrant(qdrant_client, vec, initial_k, score_threshold)
+            except Exception:
+                course_hits, _ = retrieve_from_joblib(vec, initial_k)
+        else:
+            course_hits, _ = retrieve_from_joblib(vec, initial_k)
 
-    if not hits:
-        return [], source_label, "Low"
-
-    # Reranking using CrossEncoder
-    try:
-        cross_encoder = get_cross_encoder()
-        pairs = [[query, h.get("text", "")] for h in hits]
-        scores = cross_encoder.predict(pairs)
-        
-        for idx, score in enumerate(scores):
-            hits[idx]["cross_score"] = float(score)
-            
-        hits = sorted(hits, key=lambda x: x["cross_score"], reverse=True)
-        hits = hits[:top_k]
-        
-        avg_score = sum(h["cross_score"] for h in hits) / len(hits)
-        # Empirical thresholds for ms-marco cross encoders
-        if avg_score > 3.0:
-            confidence = "High"
-        elif avg_score > 0.0:
-            confidence = "Medium"
+        # Reranking using CrossEncoder
+        if course_hits:
+            try:
+                cross_encoder = get_cross_encoder()
+                pairs = [[query, h.get("text", "")] for h in course_hits]
+                scores = cross_encoder.predict(pairs)
+                
+                for idx, score in enumerate(scores):
+                    course_hits[idx]["cross_score"] = float(score)
+                    
+                course_hits = sorted(course_hits, key=lambda x: x["cross_score"], reverse=True)
+                course_hits = course_hits[:top_k]
+                
+                avg_score = sum(h["cross_score"] for h in course_hits) / len(course_hits)
+                # Adjusted empirical thresholds for Confidence
+                if avg_score >= 0.80:
+                    confidence = "High"
+                elif avg_score >= 0.60:
+                    confidence = "Medium"
+                else:
+                    confidence = "Low"
+            except Exception:
+                course_hits = course_hits[:top_k]
+                confidence = "Medium"
         else:
             confidence = "Low"
-    except Exception as e:
-        # Fallback if cross encoder fails
-        hits = hits[:top_k]
-        confidence = "Medium"
 
-    return hits, source_label, confidence
+    # 2. Smart Mode Routing
+    force_web = is_current_event(query)
+    
+    do_web_search = False
+    
+    if mode == "web":
+        do_web_search = True
+        course_hits = []
+        confidence = "High" # Native web knowledge
+    elif mode == "hybrid":
+        do_web_search = True
+    elif mode == "smart":
+        if force_web or confidence == "Low":
+            do_web_search = True
+            course_hits = [] # Discard low-confidence course hits to focus on web
+        elif confidence == "Medium":
+            do_web_search = True
 
+    if do_web_search:
+        web_hits = search_web(query)
+    
+    # 3. Knowledge Labeling
+    if course_hits and not web_hits:
+        label = "📚 Course Knowledge"
+    elif web_hits and not course_hits:
+        label = "🌐 Web Knowledge"
+        if mode == "smart" and not course_hits:
+            confidence = "High" # Because we've defaulted to DDG directly
+    elif course_hits and web_hits:
+        label = "🔀 Hybrid Knowledge"
+
+    # Update analytics
+    from backend.telegram.analytics import AnalyticsStore
+    if "Course" in label:
+        AnalyticsStore.add_course_search()
+    elif "Web" in label:
+        AnalyticsStore.add_web_search()
+    elif "Hybrid" in label:
+        AnalyticsStore.add_hybrid_search()
+
+    return {
+        "course_hits": course_hits,
+        "web_hits": web_hits,
+        "confidence": confidence,
+        "label": label
+    }
 
 # ── Prompt builder ────────────────────────────────────────────────────────────
 
-def build_rag_prompt(query: str, hits: List[Dict[str, Any]]) -> str:
-    """Build the new educational RAG prompt."""
-    chunks_json = json.dumps(
+def build_rag_prompt(query: str, result_dict: dict) -> str:
+    """Build the new educational RAG prompt incorporating course and web hits."""
+    course_hits = result_dict.get("course_hits", [])
+    web_hits = result_dict.get("web_hits", [])
+    label = result_dict.get("label", "")
+    confidence = result_dict.get("confidence", "Medium")
+    
+    course_json = json.dumps(
         [
             {
                 "title":  h.get("title",  ""),
                 "number": h.get("number", ""),
                 "start":  h.get("start",  0.0),
-                "end":    h.get("end",    0.0),
                 "text":   h.get("text",   ""),
             }
-            for h in hits
-        ],
-        indent=2,
-    )
-    return f'''You are MindMesh AI, an educational AI assistant teaching web development.
+            for h in course_hits
+        ], indent=2
+    ) if course_hits else "[]"
+    
+    web_json = json.dumps(
+        [
+            {
+                "title": w.get("title", ""),
+                "href": w.get("href", ""),
+                "body": w.get("body", "")
+            }
+            for w in web_hits
+        ], indent=2
+    ) if web_hits else "[]"
 
-Your job is to answer the user's question using the provided course content.
+    return f'''You are MindMesh AI, an educational AI assistant.
+
+Your job is to answer the user's question using the provided context (Course Chunks and/or Web Search Results).
 
 Rules:
-1. First provide a direct and complete answer.
-2. Explain concepts in simple language.
-3. Do not only list source chunks.
-4. If multiple chunks contain partial information, combine them into one coherent explanation.
-5. Only show sources after the answer.
-6. If the answer is not fully available in the course content, use the retrieved context and clearly state that the explanation is inferred from the course material.
-7. Never respond with only timestamps or video references.
-8. Format responses as:
+1. Always start your response with the label provided: {label}
+2. Explain concepts in simple, human language.
+3. Provide a direct answer first.
+4. If the label is "🔀 Hybrid Knowledge", seamlessly combine knowledge from both sources.
+5. Key Points should be bulleted.
+6. Only show sources after the answer.
+7. Format Course Sources like: "📚 [Video Name] (Video [number])"
+8. Format Web Sources like: "🌐 [Article Title](URL)"
+9. Always output the exact Confidence score before Sources.
+10. Format exactly as:
 
-Answer:
+{label}
+
 [Detailed explanation]
 
 Key Points:
 • Point 1
 • Point 2
-• Point 3
+
+Confidence:
+🟢 High / 🟡 Medium / 🔴 Low (Match exactly: {confidence})
 
 Sources:
-• Video Name (timestamp)
+[List course and web sources here]
 
-Course Content Chunks:
-{chunks_json}
 ---------------------------------
+Course Context:
+{course_json}
+
+Web Context:
+{web_json}
+
 User Question: "{query}"'''
 
 

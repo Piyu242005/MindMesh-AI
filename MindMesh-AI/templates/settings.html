@@ -35,6 +35,16 @@
             <div class="space-y-6">
                 
                 <div>
+                    <label class="block text-sm font-medium text-gray-400 mb-2">Web Search Mode</label>
+                    <select name="web_search_mode" class="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-accent transition-colors appearance-none">
+                        <option value="smart" {% if web_search_mode == 'smart' %}selected{% endif %}>Smart Mode (Default)</option>
+                        <option value="course" {% if web_search_mode == 'course' %}selected{% endif %}>Course Only</option>
+                        <option value="hybrid" {% if web_search_mode == 'hybrid' %}selected{% endif %}>Hybrid</option>
+                        <option value="web" {% if web_search_mode == 'web' %}selected{% endif %}>Web Only</option>
+                    </select>
+                </div>
+
+                <div>
                     <label class="block text-sm font-medium text-gray-400 mb-2">Active LLM Provider</label>
                     <select name="provider" class="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-accent transition-colors appearance-none">
                         <option value="gemini" {% if provider == 'gemini' %}selected{% endif %}>Google Gemini (Primary)</option>

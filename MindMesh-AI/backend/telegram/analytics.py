@@ -4,7 +4,11 @@ class AnalyticsStore:
     videos_uploaded = 0
     gemini_requests = 0
     groq_requests = 0
-    qdrant_searches = 0
+    
+    course_searches = 0
+    web_searches = 0
+    hybrid_searches = 0
+    
     total_response_time = 0.0
 
     @classmethod
@@ -14,7 +18,9 @@ class AnalyticsStore:
         cls.videos_uploaded = 0
         cls.gemini_requests = 0
         cls.groq_requests = 0
-        cls.qdrant_searches = 0
+        cls.course_searches = 0
+        cls.web_searches = 0
+        cls.hybrid_searches = 0
         cls.total_response_time = 0.0
 
     @classmethod
@@ -31,8 +37,21 @@ class AnalyticsStore:
         cls.videos_uploaded += 1
 
     @classmethod
+    def add_course_search(cls):
+        cls.course_searches += 1
+
+    @classmethod
+    def add_web_search(cls):
+        cls.web_searches += 1
+
+    @classmethod
+    def add_hybrid_search(cls):
+        cls.hybrid_searches += 1
+
+    # Keep old add_search for backwards compatibility if needed
+    @classmethod
     def add_search(cls):
-        cls.qdrant_searches += 1
+        pass
         
     @classmethod
     def generate_report(cls) -> str:
@@ -46,7 +65,9 @@ Videos Uploaded: {cls.videos_uploaded}
 Gemini Requests: {cls.gemini_requests}
 Groq Requests: {cls.groq_requests}
 
-Qdrant Searches: {cls.qdrant_searches}
+📚 Course Searches: {cls.course_searches}
+🌐 Web Searches: {cls.web_searches}
+🔀 Hybrid Searches: {cls.hybrid_searches}
 
 Average Response Time: {avg_time:.2f}s"""
         return msg

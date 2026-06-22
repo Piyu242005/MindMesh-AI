@@ -18,13 +18,15 @@ async def settings_page(request: Request):
     provider = os.getenv("LLM_PROVIDER", "gemini")
     gemini_model = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
     groq_model = os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile")
+    web_search_mode = os.getenv("WEB_SEARCH_MODE", "smart")
     
     return templates.TemplateResponse(request=request, name="settings.html", context={
         "request": request,
         "health": health,
         "provider": provider,
         "gemini_model": gemini_model,
-        "groq_model": groq_model
+        "groq_model": groq_model,
+        "web_search_mode": web_search_mode
     })
 
 @router.post("/api/settings")
@@ -32,12 +34,14 @@ async def update_settings(
     request: Request,
     provider: str = Form(...),
     gemini_model: str = Form(...),
-    groq_model: str = Form(...)
+    groq_model: str = Form(...),
+    web_search_mode: str = Form(...)
 ):
     # Update environment variables
     os.environ["LLM_PROVIDER"] = provider
     os.environ["GEMINI_MODEL"] = gemini_model
     os.environ["GROQ_MODEL"] = groq_model
+    os.environ["WEB_SEARCH_MODE"] = web_search_mode
     
     # If .env exists, update it to persist (requires python-dotenv set_key or similar)
     if ENV_FILE.exists():
@@ -45,6 +49,7 @@ async def update_settings(
             set_key(str(ENV_FILE), "LLM_PROVIDER", provider)
             set_key(str(ENV_FILE), "GEMINI_MODEL", gemini_model)
             set_key(str(ENV_FILE), "GROQ_MODEL", groq_model)
+            set_key(str(ENV_FILE), "WEB_SEARCH_MODE", web_search_mode)
         except Exception as e:
             pass
             
