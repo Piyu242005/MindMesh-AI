@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MindMesh AI</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Tailwind config for custom colors -->
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        background: '#0A0A0A',
+                        panel: '#111111',
+                        accent: '#EF4444' // Red-500
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- HTMX -->
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    <!-- HTMX SSE Extension -->
+    <script src="https://unpkg.com/htmx.org/dist/ext/sse.js"></script>
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body class="bg-background text-gray-200 h-screen flex overflow-hidden font-sans">
+    
+    <!-- Sidebar -->
+    <aside class="w-64 bg-panel border-r border-white/5 flex flex-col h-full flex-shrink-0">
+        <div class="p-6 flex items-center gap-3">
+            <span class="text-2xl">🧠</span>
+            <h1 class="text-xl font-bold tracking-tight">Mind<span class="text-accent">Mesh</span> AI</h1>
+        </div>
+        
+        <nav class="flex-1 px-4 space-y-2 mt-4">
+            <a href="/" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-white/5 transition-colors {% if request.url.path == '/' %}bg-white/5 text-accent{% endif %}">
+                <span class="text-xl">📊</span> Dashboard
+            </a>
+            <a href="/upload" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-white/5 transition-colors {% if request.url.path == '/upload' %}bg-white/5 text-accent{% endif %}">
+                <span class="text-xl">📤</span> Upload Center
+            </a>
+            <a href="/chat" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-white/5 transition-colors {% if request.url.path == '/chat' %}bg-white/5 text-accent{% endif %}">
+                <span class="text-xl">💬</span> AI Chat
+            </a>
+            <a href="/settings" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-white/5 transition-colors {% if request.url.path == '/settings' %}bg-white/5 text-accent{% endif %}">
+                <span class="text-xl">⚙️</span> Settings
+            </a>
+        </nav>
+        
+        <div class="p-4 border-t border-white/5 text-xs text-center text-gray-500">
+            <p>MindMesh AI v2.0</p>
+            <p class="mt-1">Built by Piyush Ramteke</p>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 h-full overflow-y-auto relative bg-gradient-to-br from-background to-[#1a1010]">
+        {% block content %}{% endblock %}
+    </main>
+
+</body>
+</html>

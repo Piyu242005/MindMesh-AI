@@ -1,0 +1,75 @@
+/* Custom styles to augment Tailwind CSS */
+:root {
+  --primary-accent: #EF4444; /* Tailwind Red-500 */
+}
+
+body {
+  background-color: #0A0A0A; /* Deep black/dark gray */
+  color: #F3F4F6; /* Light gray text */
+}
+
+/* Custom scrollbar for chat */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent; 
+}
+::-webkit-scrollbar-thumb {
+  background: #374151; 
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #4B5563; 
+}
+
+/* Glassmorphism utility */
+.glass-panel {
+  background: rgba(17, 24, 39, 0.7);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* Typing indicator animation */
+.dot-flashing {
+  position: relative;
+  width: 6px;
+  height: 6px;
+  border-radius: 3px;
+  background-color: #EF4444;
+  color: #EF4444;
+  animation: dot-flashing 1s infinite linear alternate;
+  animation-delay: 0.5s;
+}
+.dot-flashing::before, .dot-flashing::after {
+  content: '';
+  display: inline-block;
+  position: absolute;
+  top: 0;
+}
+.dot-flashing::before {
+  left: -10px;
+  width: 6px;
+  height: 6px;
+  border-radius: 3px;
+  background-color: #EF4444;
+  color: #EF4444;
+  animation: dot-flashing 1s infinite alternate;
+  animation-delay: 0s;
+}
+.dot-flashing::after {
+  left: 10px;
+  width: 6px;
+  height: 6px;
+  border-radius: 3px;
+  background-color: #EF4444;
+  color: #EF4444;
+  animation: dot-flashing 1s infinite alternate;
+  animation-delay: 1s;
+}
+
+@keyframes dot-flashing {
+  0% { background-color: #EF4444; }
+  50%, 100% { background-color: rgba(239, 68, 68, 0.2); }
+}

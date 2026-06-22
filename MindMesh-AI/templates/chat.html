@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="flex flex-col h-full max-w-5xl mx-auto w-full p-4 md:p-8">
+    <div class="mb-6 flex-shrink-0">
+        <h2 class="text-3xl font-bold mb-2">AI Chat</h2>
+        <p class="text-gray-400">Ask questions about your uploaded courses.</p>
+    </div>
+
+    <!-- Chat Container -->
+    <div class="flex-1 glass-panel rounded-2xl flex flex-col overflow-hidden mb-6">
+        
+        <!-- Messages Area -->
+        <div id="chat-messages" class="flex-1 overflow-y-auto p-6 space-y-6">
+            <div class="flex gap-4">
+                <div class="w-10 h-10 rounded-full bg-accent/20 flex items-center justify-center flex-shrink-0 text-xl">🤖</div>
+                <div class="bg-white/5 rounded-2xl rounded-tl-none p-4 text-gray-200 border border-white/5">
+                    Hello! I am MindMesh AI. Ask me anything about the content in your video library.
+                </div>
+            </div>
+        </div>
+
+        <!-- Input Area -->
+        <div class="p-4 border-t border-white/10 bg-black/40">
+            <form hx-post="/api/chat" hx-ext="sse" sse-connect="/api/chat" sse-swap="message" hx-target="#temp-response" class="flex gap-4" onsubmit="handleChatSubmit(event)">
+                <input type="text" name="query" id="query-input" required placeholder="Ask a question..." autocomplete="off"
+                       class="flex-1 bg-black/50 border border-white/10 rounded-xl px-5 py-4 text-white focus:outline-none focus:border-accent transition-colors text-lg">
+                <button type="submit" id="send-btn" class="bg-accent hover:bg-accent/80 text-white font-bold px-8 rounded-xl transition-colors text-xl">
+                    ➤
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    function handleChatSubmit(e) {
+        e.preventDefault();
+        const input = document.getElementById('query-input');
+        const query = input.value.trim();
+        if (!query) return;
+
+        const messages = document.getElementById('chat-messages');
+
+        // Append User Message
+        const userHtml = `
+            <div class="flex gap-4 justify-end">
+                <div class="bg-accent/20 rounded-2xl rounded-tr-none p-4 text-white border border-accent/20 max-w-[80%]">
+                    ${query}
+                </div>
+                <div class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center flex-shrink-0 text-xl">👤</div>
+            </div>
+        `;
+        messages.insertAdjacentHTML('beforeend', userHtml);
+
+        // Append AI Temp Message Container
+        const aiHtml = `
+            <div class="flex gap-4" id="current-response-container">
+                <div class="w-10 h-10 rounded-full bg-accent/20 flex items-center justify-center flex-shrink-0 text-xl">🤖</div>
+                <div class="bg-white/5 rounded-2xl rounded-tl-none p-4 text-gray-200 border border-white/5 min-w-[100px]">
+                    <div id="temp-response" class="prose prose-invert max-w-none">
+                        <div class="dot-flashing mt-2 mb-2 ml-3"></div>
+                    </div>
+                </div>
+            </div>
+        `;
+        messages.insertAdjacentHTML('beforeend', aiHtml);
+
+        messages.scrollTop = messages.scrollHeight;
+        
+        // Actually send the form via fetch since HTMX SSE with POST is tricky
+        // We will use standard fetch for the streaming POST request
+        input.value = '';
+        input.disabled = true;
+        document.getElementById('send-btn').disabled = true;
+
+        fetch('/api/chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams({ query: query })
+        }).then(response => {
+            const reader = response.body.getReader();
+            const decoder = new TextDecoder();
+            const tempResponse = document.getElementById('temp-response');
+            tempResponse.innerHTML = ''; // clear loading dots
+
+            function read() {
+                reader.read().then(({ done, value }) => {
+                    if (done) {
+                        tempResponse.removeAttribute('id'); // finalize
+                        document.getElementById('current-response-container').removeAttribute('id');
+                        input.disabled = false;
+                        document.getElementById('send-btn').disabled = false;
+                        input.focus();
+                        return;
+                    }
+                    const chunk = decoder.decode(value);
+                    // Parse SSE data
+                    const lines = chunk.split('\n');
+                    lines.forEach(line => {
+                        if (line.startsWith('data: ')) {
+                            const data = line.substring(6);
+                            tempResponse.innerHTML += data;
+                            messages.scrollTop = messages.scrollHeight;
+                        }
+                    });
+                    read();
+                });
+            }
+            read();
+        }).catch(err => {
+            console.error(err);
+            input.disabled = false;
+            document.getElementById('send-btn').disabled = false;
+        });
+    }
+</script>
+{% endblock %}

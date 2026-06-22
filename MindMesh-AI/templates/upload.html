@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="p-8 max-w-4xl mx-auto w-full h-full flex flex-col">
+    <div class="mb-8">
+        <h2 class="text-3xl font-bold mb-2">Upload Center</h2>
+        <p class="text-gray-400">Process new video lectures and add them to the knowledge base.</p>
+    </div>
+
+    <div class="glass-panel rounded-2xl p-8">
+        <form hx-post="/api/upload" hx-encoding="multipart/form-data" hx-target="#upload-result" hx-indicator="#upload-indicator">
+            <div class="space-y-6">
+                <!-- Video Number -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-400 mb-2">Video Number</label>
+                    <input type="text" name="video_number" required placeholder="e.g. 1" 
+                           class="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-accent transition-colors">
+                </div>
+
+                <!-- Video Title -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-400 mb-2">Video Title</label>
+                    <input type="text" name="video_title" required placeholder="e.g. Introduction to HTML" 
+                           class="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-accent transition-colors">
+                </div>
+
+                <!-- File Upload -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-400 mb-2">Video File (MP4, Max 100MB)</label>
+                    <div class="border-2 border-dashed border-white/20 rounded-xl p-8 text-center hover:border-accent/50 transition-colors bg-black/30">
+                        <input type="file" name="file" accept="video/mp4" required class="w-full cursor-pointer text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-accent/10 file:text-accent hover:file:bg-accent/20">
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" class="w-full bg-accent hover:bg-accent/80 text-white font-bold py-4 rounded-xl transition-colors flex items-center justify-center gap-2">
+                    <span class="text-xl">📤</span> Process Video
+                </button>
+            </div>
+        </form>
+
+        <!-- Loading Indicator -->
+        <div id="upload-indicator" class="htmx-indicator mt-6 p-4 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-400 flex items-center gap-3">
+            <div class="animate-spin rounded-full h-5 w-5 border-2 border-blue-500 border-t-transparent"></div>
+            Uploading and starting processing pipeline... This may take a moment.
+        </div>
+
+        <!-- Result -->
+        <div id="upload-result" class="mt-6"></div>
+    </div>
+</div>
+{% endblock %}

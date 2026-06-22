@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mindmesh-config
+  namespace: mindmesh
+data:
+  QDRANT_URL: "https://your-cluster-url.cloud.qdrant.io"
+  QDRANT_COLLECTION: "mindmesh_courses"
+  LLM_PROVIDER: "gemini"

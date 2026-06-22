@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mindmesh-ai
+  namespace: mindmesh
+  labels:
+    app: mindmesh-ai
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: mindmesh-ai
+  template:
+    metadata:
+      labels:
+        app: mindmesh-ai
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/path: "/metrics"
+        prometheus.io/port: "8000"
+    spec:
+      containers:
+      - name: mindmesh-ai
+        image: ghcr.io/piyu242005/mindmesh-ai:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8000
+        resources:
+          requests:
+            cpu: "250m"
+            memory: "512Mi"
+          limits:
+            cpu: "1000m"
+            memory: "2Gi"
+        envFrom:
+        - configMapRef:
+            name: mindmesh-config
+        - secretRef:
+            name: mindmesh-secrets
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 15
+          periodSeconds: 10
+        startupProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          failureThreshold: 30
+          periodSeconds: 10

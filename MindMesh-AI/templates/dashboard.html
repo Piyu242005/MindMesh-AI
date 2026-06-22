@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="p-8 max-w-6xl mx-auto w-full">
+    <div class="mb-10">
+        <h2 class="text-3xl font-bold mb-2">Dashboard</h2>
+        <p class="text-gray-400">Overview of your MindMesh AI system.</p>
+    </div>
+
+    <!-- Analytics Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+        
+        <!-- Courses -->
+        <div class="glass-panel p-6 rounded-2xl flex flex-col items-center justify-center text-center">
+            <div class="text-4xl mb-3">📚</div>
+            <div class="text-3xl font-bold text-white mb-1">{{ total_courses }}</div>
+            <div class="text-sm text-gray-400 uppercase tracking-wider">Total Courses</div>
+        </div>
+
+        <!-- Chunks -->
+        <div class="glass-panel p-6 rounded-2xl flex flex-col items-center justify-center text-center">
+            <div class="text-4xl mb-3">🧩</div>
+            <div class="text-3xl font-bold text-white mb-1">{{ total_chunks }}</div>
+            <div class="text-sm text-gray-400 uppercase tracking-wider">Total Chunks</div>
+        </div>
+
+        <!-- Queries -->
+        <div class="glass-panel p-6 rounded-2xl flex flex-col items-center justify-center text-center">
+            <div class="text-4xl mb-3">💬</div>
+            <div class="text-3xl font-bold text-white mb-1">{{ total_queries }}</div>
+            <div class="text-sm text-gray-400 uppercase tracking-wider">Total Queries</div>
+        </div>
+
+        <!-- Active Model -->
+        <div class="glass-panel p-6 rounded-2xl flex flex-col items-center justify-center text-center">
+            <div class="text-4xl mb-3">🤖</div>
+            <div class="text-xl font-bold text-white mb-1 break-all">{{ active_model }}</div>
+            <div class="text-sm text-gray-400 uppercase tracking-wider">Active Model</div>
+        </div>
+
+    </div>
+
+    <!-- System Health / Qdrant Status -->
+    <div class="glass-panel rounded-2xl p-8">
+        <h3 class="text-xl font-bold mb-6 flex items-center gap-2">
+            <span>⚙️</span> System Status
+        </h3>
+        <div class="space-y-4">
+            <div class="flex justify-between items-center p-4 rounded-xl bg-white/5 border border-white/5">
+                <div class="flex items-center gap-3">
+                    <div class="w-3 h-3 rounded-full {% if qdrant_status != 'Error' %}bg-green-500{% else %}bg-red-500{% endif %}"></div>
+                    <span class="font-medium">Qdrant Vector Database</span>
+                </div>
+                <span class="text-gray-400">{{ qdrant_status }}</span>
+            </div>
+            
+            <div class="flex justify-between items-center p-4 rounded-xl bg-white/5 border border-white/5">
+                <div class="flex items-center gap-3">
+                    <div class="w-3 h-3 rounded-full bg-green-500"></div>
+                    <span class="font-medium">API Server</span>
+                </div>
+                <span class="text-gray-400">Online</span>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
