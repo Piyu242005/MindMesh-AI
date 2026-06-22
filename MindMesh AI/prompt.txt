@@ -1,6 +1,42 @@
 I am teaching web development in my Sigma web development course. Here are video subtitle chunks containing video title, video number, start time in seconds, end time in seconds, the text at that time:
 
-[{"title":"Entities, Code tag and more on HTML","number":"13","start":2.56,"end":5.24,"text":" In today's video, we will conclude HTML"},{"title":"Entities, Code tag and more on HTML","number":"13","start":520.32,"end":522.16,"text":" HTML has been concluded."},{"title":"Your First HTML Website","number":"2","start":1064.44,"end":1065.44,"text":" I will finish HTML"},{"title":"Introduction to CSS","number":"14","start":5.28,"end":7.28,"text":" We have finished the whole HTML."},{"title":"Entities, Code tag and more on HTML","number":"13","start":55.36,"end":59.36,"text":" I will tell you some things and after this video, I will conclude HTML."}]
+[
+  {
+    "title": "Your First HTML Website",
+    "number": "2",
+    "start": 1618.44,
+    "end": 1619.44,
+    "text": " make a web development"
+  },
+  {
+    "title": "Installing VS Code & How Websites Work",
+    "number": "1",
+    "start": 1592.3,
+    "end": 1595.3,
+    "text": " in web development"
+  },
+  {
+    "title": "Your First HTML Website",
+    "number": "2",
+    "start": 1621.44,
+    "end": 1622.44,
+    "text": " in web development."
+  },
+  {
+    "title": "CSS Selectors MasterClass",
+    "number": "17",
+    "start": 757.6,
+    "end": 759.6,
+    "text": " When you do web development."
+  },
+  {
+    "title": "Your First HTML Website",
+    "number": "2",
+    "start": 1243.44,
+    "end": 1245.44,
+    "text": " to explain web development to you."
+  }
+]
 ---------------------------------
-"where is html concluded in this course"
+"What is web development?"
 User asked this question related to the video chunks, you have to answer in a human way (dont mention the above format, its just for you) where and how much content is taught in which video (in which video and at what timestamp) and guide the user to go to that particular video. If user asks unrelated question, tell him that you can only answer questions related to the course

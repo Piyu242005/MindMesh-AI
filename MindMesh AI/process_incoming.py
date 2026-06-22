@@ -137,7 +137,7 @@ User asked this question related to the video chunks, you have to answer in a hu
 qdrant_client = None
 try:
     qdrant_client = qh.get_client()
-    print(f"[Qdrant] Connected to '{qh.QDRANT_COLLECTION}' ✓")
+    print(f"[Qdrant] Connected to '{qh.QDRANT_COLLECTION}' [OK]")
 except Exception as e:
     print(f"[Qdrant] Unavailable ({e}) — using joblib fallback.")
 

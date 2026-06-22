@@ -146,7 +146,7 @@ with col_qdrant:
             display_status = "Degraded"
         elif "green" in status_lower or "ok" in status_lower:
             badge_cls = "mm-badge-ok"
-            display_status = "Ready"
+            display_status = "Active"
         else:
             badge_cls = "mm-badge-warn"
             display_status = col_status

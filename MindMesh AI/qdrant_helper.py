@@ -89,8 +89,8 @@ def collection_info(client) -> Dict[str, Any]:
         return {
             "collection_name": QDRANT_COLLECTION,
             "status":          str(info.status),
-            "vector_count":    info.vectors_count or 0,
-            "segments_count":  info.segments_count or 0,
+            "vector_count":    getattr(info, "points_count", getattr(info, "vectors_count", 0)),
+            "segments_count":  getattr(info, "segments_count", 0),
             "vector_size":     VECTOR_SIZE,
             "distance":        "Cosine",
         }
@@ -156,15 +156,15 @@ def search(
         score    : float  — cosine similarity score (0–1)
         point_id : int    — Qdrant point ID
     """
-    results = client.search(
+    results = client.query_points(
         collection_name=QDRANT_COLLECTION,
-        query_vector=query_vector,
+        query=query_vector,
         limit=top_k,
         with_payload=True,
     )
 
     hits = []
-    for r in results:
+    for r in getattr(results, "points", results):
         hit = dict(r.payload)          # copy all metadata from payload
         hit["score"]    = round(r.score, 4)
         hit["point_id"] = r.id
