@@ -1,6 +1,5 @@
 # ── Large Binary / Media Files ──────────────────────────────────────────────
 *.zip
-*.mp3
 *.mp4
 *.webm
 *.mkv
