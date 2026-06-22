@@ -38,7 +38,9 @@ By orchestrating intelligent routing between Google Gemini 2.5 Flash and Groq's 
 
 ## 📸 Screenshots
 
-*(Add screenshots of the Modern Dashboard, Chat Interface, and Onboarding Modal here)*
+![Modern Dashboard](MindMesh-AI/assets/DASHBOARD.png)
+<br>
+![Chat Interface](MindMesh-AI/assets/AI%20REPSONSE.png)
 
 ---
 

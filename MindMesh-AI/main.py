@@ -89,7 +89,7 @@ async def global_exception_handler(request: Request, exc: Exception):
 
 # ── Mounts & Routes ────────────────────────────────────────────────────────
 app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
-app.mount("/assets", StaticFiles(directory=str(ASSETS_DIR)), name="assets")
+app.mount("/assets", StaticFiles(directory=str(ROOT / "assets")), name="assets")
 
 @app.get("/health")
 def health():
