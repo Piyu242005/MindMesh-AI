@@ -58,13 +58,52 @@
             <a href="/upload" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-white/5 transition-colors {% if request.url.path == '/upload' %}bg-white/5 text-accent{% endif %}">
                 <span class="text-xl">📤</span> Upload Center
             </a>
-            <a href="/chat" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-white/5 transition-colors {% if request.url.path == '/chat' %}bg-white/5 text-accent{% endif %}">
-                <span class="text-xl">💬</span> AI Chat
+            <a href="/chat" class="flex items-center justify-between gap-3 px-4 py-3 rounded-lg hover:bg-white/5 transition-colors {% if request.url.path == '/chat' %}bg-white/5 text-accent{% endif %}">
+                <div class="flex items-center gap-3"><span class="text-xl">💬</span> AI Chat</div>
+                <button onclick="window.location.href='/chat'; event.preventDefault();" class="text-gray-400 hover:text-white" title="New Chat">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                </button>
             </a>
+            
+            <!-- Chat History Section -->
+            <div id="sidebar-chat-history" class="mt-6 hidden">
+                <h3 class="px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Recent Chats</h3>
+                <div id="history-list" class="space-y-1 overflow-y-auto max-h-48 pr-2 custom-scrollbar">
+                    <!-- Javascript will populate this -->
+                </div>
+            </div>
+
             <a href="/settings" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-white/5 transition-colors {% if request.url.path == '/settings' %}bg-white/5 text-accent{% endif %}">
                 <span class="text-xl">⚙️</span> Settings
             </a>
         </nav>
+        
+        <script>
+            // Fetch and render sidebar history
+            async function loadSidebarHistory() {
+                try {
+                    const res = await fetch('/api/conversations');
+                    const data = await res.json();
+                    const list = document.getElementById('history-list');
+                    const container = document.getElementById('sidebar-chat-history');
+                    
+                    if (data.conversations && data.conversations.length > 0) {
+                        container.classList.remove('hidden');
+                        list.innerHTML = '';
+                        data.conversations.forEach(c => {
+                            const icon = c.is_pinned ? '⭐' : '📄';
+                            list.innerHTML += `
+                                <a href="/chat?id=${c.id}" class="flex items-center gap-2 px-4 py-2 rounded text-sm text-gray-400 hover:bg-white/5 hover:text-gray-200 transition-colors truncate">
+                                    <span>${icon}</span>
+                                    <span class="truncate">${c.title}</span>
+                                </a>
+                            `;
+                        });
+                    }
+                } catch (e) { console.error('Failed to load history', e); }
+            }
+            document.addEventListener("DOMContentLoaded", loadSidebarHistory);
+        </script>
         
         <div class="p-4 border-t border-white/5 text-xs text-center text-gray-500">
             <p>MindMesh AI v2.0</p>

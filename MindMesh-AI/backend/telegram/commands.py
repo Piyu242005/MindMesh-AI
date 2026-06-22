@@ -61,35 +61,70 @@ async def handle_command(text: str, chat_id: str):
         send_message("Commands:\n/status\n/uptime\n/stats\n/health\n/qdrant\n/gemini\n/groq\nJust type a question to ask the AI!", chat_id)
 
 async def handle_ai_query(text: str, chat_id: str):
-    """Processes RAG query via LLM Manager."""
-    from backend.retrieval import retrieve, rewrite_query
+    """Processes RAG query via LLM Manager with memory."""
+    from backend.retrieval import retrieve, build_rag_prompt, rewrite_query
+    from backend.memory import (
+        get_conversation, create_conversation, get_chat_history,
+        add_message, generate_conversation_title, update_conversation_title,
+        generate_conversation_summary, update_conversation_summary
+    )
+    
+    chat_id_str = str(chat_id)
     try:
         start_time = time.time()
+        
+        # Check if conversation exists, create if not
+        conv = get_conversation(chat_id_str)
+        is_new = False
+        summary = ""
+        chat_history = []
+        
+        if not conv:
+            create_conversation(chat_id_str, title="Telegram Chat")
+            is_new = True
+        else:
+            chat_history = get_chat_history(chat_id_str, limit=8)
+            summary = conv.get("summary", "")
+            
+        # Add User Message to DB
+        add_message(chat_id_str, role="user", content=text)
+
         optimized_query = rewrite_query(text)
         
         q_client, _ = get_qdrant_client()
         embed_model = get_embedding_model()
         
-        hits, source_label, confidence = retrieve(
+        # Fix retrieval unpacking
+        retrieval_result = retrieve(
             embed_model=embed_model,
             query=optimized_query,
             qdrant_client=q_client,
             top_k=5,
             score_threshold=0.0
         )
-
-        if not hits:
-            send_message("⚠️ No source context found.", chat_id)
-            return
-
-        prompt = build_rag_prompt(optimized_query, hits)
         
-        # Use existing LLM manager with built-in Gemini -> Groq failover
+        confidence = retrieval_result.get("confidence", "Medium")
+
+        prompt = build_rag_prompt(optimized_query, retrieval_result, chat_history=chat_history, summary=summary)
+        
         provider = os.getenv("LLM_PROVIDER", "gemini")
         model = os.getenv("GEMINI_MODEL", "gemini-2.5-flash") if provider == "gemini" else os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile")
         
         answer = generate_response(prompt, provider=provider, model_name=model, stream=False)
         
+        # Add Assistant Message to DB
+        add_message(chat_id_str, role="assistant", content=answer, confidence=confidence)
+        
+        if is_new:
+            title = generate_conversation_title(text)
+            update_conversation_title(chat_id_str, title)
+            
+        if len(chat_history) >= 18 and len(chat_history) % 10 == 0:
+            from backend.memory import get_full_chat_history
+            full_history = get_full_chat_history(chat_id_str)
+            new_summary = generate_conversation_summary(full_history)
+            update_conversation_summary(chat_id_str, new_summary)
+            
         # Format response
         conf_icon = "🟢" if confidence == "High" else "🟡" if confidence == "Medium" else "🔴"
         source_ref = f"\n\n{conf_icon} <b>Confidence:</b> {confidence}"

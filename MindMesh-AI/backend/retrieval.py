@@ -157,7 +157,7 @@ def retrieve(
     # 1. Course Retrieval
     if mode in ["smart", "course", "hybrid"]:
         vec = embed_single(query, embed_model)
-        initial_k = 20
+        initial_k = 10
 
         if qdrant_client is not None:
             try:
@@ -167,30 +167,36 @@ def retrieve(
         else:
             course_hits, _ = retrieve_from_joblib(vec, initial_k)
 
-        # Reranking using CrossEncoder
+        # Reranking using CrossEncoder only if base confidence is low
         if course_hits:
-            try:
-                cross_encoder = get_cross_encoder()
-                pairs = [[query, h.get("text", "")] for h in course_hits]
-                scores = cross_encoder.predict(pairs)
-                
-                for idx, score in enumerate(scores):
-                    course_hits[idx]["cross_score"] = float(score)
+            avg_base_score = sum(h.get("score", 0) for h in course_hits) / len(course_hits)
+            
+            if avg_base_score >= 0.75:
+                # High confidence from base retrieval, skip reranking to save time
+                course_hits = course_hits[:top_k]
+                confidence = "High"
+            else:
+                try:
+                    cross_encoder = get_cross_encoder()
+                    pairs = [[query, h.get("text", "")] for h in course_hits]
+                    scores = cross_encoder.predict(pairs)
                     
-                course_hits = sorted(course_hits, key=lambda x: x["cross_score"], reverse=True)
-                course_hits = course_hits[:top_k]
-                
-                avg_score = sum(h["cross_score"] for h in course_hits) / len(course_hits)
-                # Adjusted empirical thresholds for Confidence
-                if avg_score >= 0.80:
-                    confidence = "High"
-                elif avg_score >= 0.60:
+                    for idx, score in enumerate(scores):
+                        course_hits[idx]["cross_score"] = float(score)
+                        
+                    course_hits = sorted(course_hits, key=lambda x: x.get("cross_score", 0), reverse=True)
+                    course_hits = course_hits[:top_k]
+                    
+                    avg_score = sum(h.get("cross_score", 0) for h in course_hits) / len(course_hits)
+                    if avg_score >= 0.80:
+                        confidence = "High"
+                    elif avg_score >= 0.60:
+                        confidence = "Medium"
+                    else:
+                        confidence = "Low"
+                except Exception:
+                    course_hits = course_hits[:top_k]
                     confidence = "Medium"
-                else:
-                    confidence = "Low"
-            except Exception:
-                course_hits = course_hits[:top_k]
-                confidence = "Medium"
         else:
             confidence = "Low"
 
@@ -243,8 +249,8 @@ def retrieve(
 
 # ── Prompt builder ────────────────────────────────────────────────────────────
 
-def build_rag_prompt(query: str, result_dict: dict) -> str:
-    """Build the new educational RAG prompt incorporating course and web hits."""
+def build_rag_prompt(query: str, result_dict: dict, chat_history: list = None, summary: str = None) -> str:
+    """Build the new educational RAG prompt incorporating course, web hits, and chat history."""
     course_hits = result_dict.get("course_hits", [])
     web_hits = result_dict.get("web_hits", [])
     label = result_dict.get("label", "")
@@ -273,9 +279,17 @@ def build_rag_prompt(query: str, result_dict: dict) -> str:
         ], indent=2
     ) if web_hits else "[]"
 
+    history_text = ""
+    if summary:
+        history_text += f"\nPrevious Conversation Summary:\n{summary}\n"
+    if chat_history:
+        history_text += "\nRecent Conversation History:\n"
+        for msg in chat_history:
+            history_text += f"{msg['role'].capitalize()}: {msg['content']}\n"
+
     return f'''You are MindMesh AI, an educational AI assistant.
 
-Your job is to answer the user's question using the provided context (Course Chunks and/or Web Search Results).
+Your job is to answer the user's question using the provided context (Course Chunks and/or Web Search Results) and context from the Conversation History.
 
 Rules:
 1. Always start your response with the label provided: {label}
@@ -287,7 +301,8 @@ Rules:
 7. Format Course Sources like: "📚 [Video Name] (Video [number])"
 8. Format Web Sources like: "🌐 [Article Title](URL)"
 9. Always output the exact Confidence score before Sources.
-10. Format exactly as:
+10. If the user asks a follow-up question (e.g. "What about CSS?"), use the Conversation History to understand what they are referring to.
+11. Format exactly as:
 
 {label}
 
@@ -303,7 +318,7 @@ Confidence:
 Sources:
 [List course and web sources here]
 
----------------------------------
+---------------------------------{history_text}
 Course Context:
 {course_json}
 

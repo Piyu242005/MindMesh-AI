@@ -2,9 +2,16 @@
 
 {% block content %}
 <div class="flex flex-col h-full max-w-5xl mx-auto w-full p-4 md:p-8">
-    <div class="mb-6 flex-shrink-0">
-        <h2 class="text-3xl font-bold mb-2">AI Chat</h2>
-        <p class="text-gray-400">Ask questions about your uploaded courses.</p>
+    <div class="mb-6 flex-shrink-0 flex justify-between items-end">
+        <div>
+            <h2 class="text-3xl font-bold mb-2" id="chat-title">AI Chat</h2>
+            <p class="text-gray-400">Ask questions about your uploaded courses.</p>
+        </div>
+        <div id="export-controls" class="hidden gap-2">
+            <button onclick="exportChat('md')" class="px-3 py-1 bg-white/5 hover:bg-white/10 rounded border border-white/10 text-xs">📄 Export MD</button>
+            <button onclick="exportChat('json')" class="px-3 py-1 bg-white/5 hover:bg-white/10 rounded border border-white/10 text-xs">📋 Export JSON</button>
+            <button onclick="deleteChat()" class="px-3 py-1 bg-red-500/20 hover:bg-red-500/40 text-red-200 rounded border border-red-500/20 text-xs">🗑️ Delete</button>
+        </div>
     </div>
 
     <!-- Chat Container -->
@@ -34,6 +41,76 @@
 </div>
 
 <script>
+    let currentConversationId = new URLSearchParams(window.location.search).get('id');
+
+    async function loadChatHistory() {
+        if (!currentConversationId) return;
+        
+        try {
+            const res = await fetch(`/api/conversations/${currentConversationId}`);
+            const data = await res.json();
+            
+            if (data.error) {
+                window.location.href = '/chat';
+                return;
+            }
+
+            document.getElementById('chat-title').innerText = data.conversation.title;
+            document.getElementById('export-controls').classList.remove('hidden');
+            document.getElementById('export-controls').classList.add('flex');
+
+            const messages = document.getElementById('chat-messages');
+            // Remove the default welcome message
+            messages.innerHTML = '';
+
+            data.messages.forEach(msg => {
+                if (msg.role === 'user') {
+                    messages.insertAdjacentHTML('beforeend', `
+                        <div class="flex gap-4 justify-end">
+                            <div class="bg-accent/20 rounded-2xl rounded-tr-none p-4 text-white border border-accent/20 max-w-[80%]">
+                                ${msg.content}
+                            </div>
+                            <div class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center flex-shrink-0 text-xl">👤</div>
+                        </div>
+                    `);
+                } else {
+                    let confHtml = '';
+                    if (msg.confidence) {
+                        const icon = msg.confidence === 'High' ? '🟢' : msg.confidence === 'Medium' ? '🟡' : '🔴';
+                        confHtml = `<div class='text-sm mb-4 font-semibold text-gray-300'>${icon} Confidence: ${msg.confidence}</div>`;
+                    }
+                    messages.insertAdjacentHTML('beforeend', `
+                        <div class="flex gap-4">
+                            <img src="/assets/logo.png" alt="AI Avatar" class="w-10 h-10 rounded-full bg-accent/10 border border-accent/20 object-contain p-1 flex-shrink-0">
+                            <div class="bg-white/5 rounded-2xl rounded-tl-none p-4 text-gray-200 border border-white/5 min-w-[100px] prose prose-invert max-w-none">
+                                ${confHtml}
+                                ${msg.content.replace(/\n/g, '<br>')}
+                            </div>
+                        </div>
+                    `);
+                }
+            });
+            messages.scrollTop = messages.scrollHeight;
+        } catch (e) {
+            console.error('Failed to load history', e);
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', loadChatHistory);
+
+    function exportChat(format) {
+        if (currentConversationId) {
+            window.location.href = `/api/conversations/${currentConversationId}/export/${format}`;
+        }
+    }
+    
+    async function deleteChat() {
+        if (confirm('Are you sure you want to delete this conversation?')) {
+            await fetch(`/api/conversations/${currentConversationId}`, { method: 'DELETE' });
+            window.location.href = '/chat';
+        }
+    }
+
     function handleChatSubmit(e) {
         e.preventDefault();
         const input = document.getElementById('query-input');
@@ -41,6 +118,11 @@
         if (!query) return;
 
         const messages = document.getElementById('chat-messages');
+
+        // Remove the default welcome message if it's the first message
+        if (!currentConversationId && messages.children.length === 1 && messages.innerHTML.includes('Hello! I am MindMesh AI')) {
+            messages.innerHTML = '';
+        }
 
         // Append User Message
         const userHtml = `
@@ -68,17 +150,33 @@
 
         messages.scrollTop = messages.scrollHeight;
         
-        // Actually send the form via fetch since HTMX SSE with POST is tricky
-        // We will use standard fetch for the streaming POST request
         input.value = '';
         input.disabled = true;
         document.getElementById('send-btn').disabled = true;
 
+        const formData = new URLSearchParams();
+        formData.append('query', query);
+        if (currentConversationId) {
+            formData.append('conversation_id', currentConversationId);
+        }
+
         fetch('/api/chat', {
             method: 'POST',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: new URLSearchParams({ query: query })
+            body: formData
         }).then(response => {
+            // Update URL if this was a new conversation
+            const newConvId = response.headers.get('X-Conversation-Id');
+            if (newConvId && newConvId !== currentConversationId) {
+                currentConversationId = newConvId;
+                window.history.pushState({}, '', '/chat?id=' + currentConversationId);
+                document.getElementById('export-controls').classList.remove('hidden');
+                document.getElementById('export-controls').classList.add('flex');
+                if (typeof loadSidebarHistory === 'function') {
+                    setTimeout(loadSidebarHistory, 1000); // Reload sidebar
+                }
+            }
+
             const reader = response.body.getReader();
             const decoder = new TextDecoder();
             const tempResponse = document.getElementById('temp-response');
@@ -95,7 +193,6 @@
                         return;
                     }
                     const chunk = decoder.decode(value);
-                    // Parse SSE data
                     const lines = chunk.split('\n');
                     lines.forEach(line => {
                         if (line.startsWith('data: ')) {
