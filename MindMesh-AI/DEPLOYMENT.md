@@ -1,3 +1,7 @@
+<div align="center">
+  <img src="assets/logo.png" width="180">
+</div>
+
 # Deployment Guide
 
 This guide covers deploying MindMesh-AI across various environments.

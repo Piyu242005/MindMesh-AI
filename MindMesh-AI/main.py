@@ -67,6 +67,16 @@ app.add_middleware(
 app.add_middleware(SecurityMonitoringMiddleware)
 
 # ── Exception Handler ──────────────────────────────────────────────────────
+from fastapi.responses import HTMLResponse
+from fastapi.exceptions import RequestValidationError
+from starlette.exceptions import HTTPException as StarletteHTTPException
+
+@app.exception_handler(StarletteHTTPException)
+async def http_exception_handler(request: Request, exc: StarletteHTTPException):
+    if exc.status_code == 404:
+        return templates.TemplateResponse("error.html", {"request": request, "status_code": 404, "message": "Page Not Found"}, status_code=404)
+    return templates.TemplateResponse("error.html", {"request": request, "status_code": exc.status_code, "message": exc.detail}, status_code=exc.status_code)
+
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception):
     error_detail = "".join(traceback.format_exception(type(exc), exc, exc.__traceback__))
@@ -75,12 +85,11 @@ async def global_exception_handler(request: Request, exc: Exception):
         route=request.url.path,
         error=repr(exc)
     )
-    # Reraise or return 500 response
-    from fastapi.responses import JSONResponse
-    return JSONResponse(status_code=500, content={"message": "Internal Server Error"})
+    return templates.TemplateResponse("error.html", {"request": request, "status_code": 500, "message": "Internal Server Error"}, status_code=500)
 
 # ── Mounts & Routes ────────────────────────────────────────────────────────
 app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
+app.mount("/assets", StaticFiles(directory=str(ROOT / "assets")), name="assets")
 templates = Jinja2Templates(directory=str(TEMPLATES_DIR))
 
 from routes import dashboard, upload, chat, settings

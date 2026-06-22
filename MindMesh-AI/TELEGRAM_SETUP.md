@@ -1,3 +1,7 @@
+<div align="center">
+  <img src="assets/logo.png" width="180">
+</div>
+
 # MindMesh AI – Telegram Integration Setup Guide
 
 This guide will walk you through enabling and configuring the full Telegram monitoring ecosystem for MindMesh AI.

@@ -13,7 +13,7 @@
         <!-- Messages Area -->
         <div id="chat-messages" class="flex-1 overflow-y-auto p-6 space-y-6">
             <div class="flex gap-4">
-                <div class="w-10 h-10 rounded-full bg-accent/20 flex items-center justify-center flex-shrink-0 text-xl">🤖</div>
+                <img src="/assets/logo.png" alt="AI Avatar" class="w-10 h-10 rounded-full bg-accent/10 border border-accent/20 object-contain p-1 flex-shrink-0">
                 <div class="bg-white/5 rounded-2xl rounded-tl-none p-4 text-gray-200 border border-white/5">
                     Hello! I am MindMesh AI. Ask me anything about the content in your video library.
                 </div>
@@ -56,7 +56,7 @@
         // Append AI Temp Message Container
         const aiHtml = `
             <div class="flex gap-4" id="current-response-container">
-                <div class="w-10 h-10 rounded-full bg-accent/20 flex items-center justify-center flex-shrink-0 text-xl">🤖</div>
+                <img src="/assets/logo.png" alt="AI Avatar" class="w-10 h-10 rounded-full bg-accent/10 border border-accent/20 object-contain p-1 flex-shrink-0">
                 <div class="bg-white/5 rounded-2xl rounded-tl-none p-4 text-gray-200 border border-white/5 min-w-[100px]">
                     <div id="temp-response" class="prose prose-invert max-w-none">
                         <div class="dot-flashing mt-2 mb-2 ml-3"></div>

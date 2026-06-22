@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MindMesh AI</title>
+    <link rel="icon" href="/assets/logo.png" type="image/png">
+    <meta property="og:image" content="/assets/logo.png">
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Tailwind config for custom colors -->
@@ -28,12 +30,24 @@
     <!-- Custom CSS -->
     <link rel="stylesheet" href="/static/css/style.css">
 </head>
-<body class="bg-background text-gray-200 h-screen flex overflow-hidden font-sans">
+    <body class="bg-background text-gray-200 h-screen flex overflow-hidden font-sans relative">
+    
+    <!-- Splash Screen -->
+    <div id="splash-screen" class="fixed inset-0 z-[100] bg-background flex flex-col items-center justify-center transition-opacity duration-700">
+        <div class="relative w-32 h-32 animate-pulse mb-8">
+            <div class="absolute inset-0 bg-accent/20 rounded-full blur-xl"></div>
+            <img src="/assets/logo.png" alt="MindMesh AI" class="w-full h-full object-contain relative z-10">
+        </div>
+        <h1 class="text-3xl font-bold tracking-tight text-white mb-2">Mind<span class="text-accent">Mesh</span> AI</h1>
+        <div class="w-48 h-1 bg-white/10 rounded-full overflow-hidden mt-4">
+            <div class="h-full bg-accent w-full origin-left animate-[scale-x_1s_ease-in-out]"></div>
+        </div>
+    </div>
     
     <!-- Sidebar -->
-    <aside class="w-64 bg-panel border-r border-white/5 flex flex-col h-full flex-shrink-0">
+    <aside class="w-64 bg-panel border-r border-white/5 flex flex-col h-full flex-shrink-0 relative z-10">
         <div class="p-6 flex items-center gap-3">
-            <span class="text-2xl">🧠</span>
+            <img src="/assets/logo.png" alt="Logo" class="w-8 h-8 object-contain rounded">
             <h1 class="text-xl font-bold tracking-tight">Mind<span class="text-accent">Mesh</span> AI</h1>
         </div>
         
@@ -59,8 +73,19 @@
     </aside>
 
     <!-- Main Content -->
-    <main class="flex-1 h-full overflow-y-auto relative bg-gradient-to-br from-background to-[#1a1010]">
-        {% block content %}{% endblock %}
+    <main class="flex-1 h-full overflow-y-auto relative bg-gradient-to-br from-background to-[#1a1010] flex flex-col">
+        <div class="flex-1 flex flex-col">
+            {% block content %}{% endblock %}
+        </div>
+        
+        <!-- Global Footer -->
+        <footer class="mt-auto py-6 border-t border-white/5 bg-background/50 backdrop-blur text-center text-sm text-gray-500">
+            <div class="flex items-center justify-center gap-2 mb-2">
+                <img src="/assets/logo.png" alt="Logo" class="w-4 h-4 opacity-50 grayscale hover:grayscale-0 transition-all">
+                <span>MindMesh AI &copy; 2026</span>
+            </div>
+            <p>Powered by FastAPI, Qdrant, and TailwindCSS.</p>
+        </footer>
     </main>
 
     <!-- Permanent Help Button -->
@@ -74,11 +99,14 @@
             
             <!-- Header -->
             <div class="p-6 border-b border-white/5 bg-gradient-to-r from-background to-panel sticky top-0 z-10 flex justify-between items-start">
-                <div>
-                    <h2 class="text-2xl font-bold flex items-center gap-2">
-                        <span>🧠</span> MindMesh AI
-                    </h2>
-                    <p class="text-gray-400 mt-1">Transform Video Courses into an Intelligent AI Knowledge Base</p>
+                <div class="flex items-center gap-4">
+                    <img src="/assets/logo.png" alt="MindMesh AI" class="w-16 h-16 object-contain">
+                    <div>
+                        <h2 class="text-2xl font-bold flex items-center gap-2">
+                            MindMesh AI
+                        </h2>
+                        <p class="text-gray-400 mt-1">Transform Video Courses into an Intelligent AI Knowledge Base</p>
+                    </div>
                 </div>
                 <button onclick="closeOnboardingModal()" class="text-gray-500 hover:text-white transition-colors p-1">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
@@ -217,6 +245,23 @@
                 closeOnboardingModal();
             }
         });
+
+        // Splash screen logic
+        window.addEventListener('load', () => {
+            const splash = document.getElementById('splash-screen');
+            if (splash) {
+                setTimeout(() => {
+                    splash.style.opacity = '0';
+                    setTimeout(() => splash.remove(), 700);
+                }, 500); // Wait 500ms before fading out
+            }
+        });
     </script>
+    <style>
+        @keyframes scale-x {
+            0% { transform: scaleX(0); }
+            100% { transform: scaleX(1); }
+        }
+    </style>
 </body>
 </html>

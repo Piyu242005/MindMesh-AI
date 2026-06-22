@@ -1,3 +1,7 @@
+<div align="center">
+  <img src="assets/logo.png" width="180">
+</div>
+
 # Kubernetes Deployment Guide
 
 This document describes how to deploy MindMesh AI onto a Kubernetes cluster.

@@ -22,7 +22,8 @@ def send_message(msg: str, chat_id: str = None) -> bool:
     try:
         response = requests.post(
             url,
-            json={"chat_id": target_chat_id, "text": msg, "parse_mode": "HTML"}
+            json={"chat_id": target_chat_id, "text": msg, "parse_mode": "HTML"},
+            timeout=3
         )
         return response.status_code == 200
     except Exception as e:
@@ -41,7 +42,9 @@ async def start_polling(dispatcher_callback):
     print("[Telegram Bot] Started long polling...")
     while True:
         try:
-            res = requests.get(url, params={"timeout": 10, "offset": offset})
+            res = await asyncio.to_thread(
+                requests.get, url, params={"timeout": 10, "offset": offset}, timeout=15
+            )
             if res.status_code == 200:
                 data = res.json()
                 for update in data.get("result", []):

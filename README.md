@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="LOGO.png" width="180">
+  <img src="MindMesh-AI/assets/logo.png" width="180">
 
   <h1>MindMesh AI</h1>
 

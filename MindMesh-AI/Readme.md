@@ -1,3 +1,7 @@
+<div align="center">
+  <img src="assets/logo.png" width="180">
+</div>
+
 # MindMesh-AI
 
 A full-stack RAG (Retrieval-Augmented Generation) AI application that processes videos and audio files, transcribes them, generates embeddings, and lets you chat with your content using Gemini and Groq models.
