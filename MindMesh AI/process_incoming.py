@@ -142,39 +142,40 @@ except Exception as e:
     print(f"[Qdrant] Unavailable ({e}) — using joblib fallback.")
 
 
-# ── Main query loop ───────────────────────────────────────────────────────────
-incoming_query = input("\nAsk a Question: ")
+if __name__ == "__main__":
+    # ── Main query loop ───────────────────────────────────────────────────────────
+    incoming_query = input("\nAsk a Question: ")
 
-query_vector = create_embedding(incoming_query)
+    query_vector = create_embedding(incoming_query)
 
-# ── Retrieval: Qdrant primary, joblib fallback ────────────────────────────────
-if qdrant_client is not None:
-    hits = retrieve_from_qdrant(qdrant_client, query_vector)
-    retrieval_source = "Qdrant Cloud"
-else:
-    hits = retrieve_from_joblib(query_vector)
-    retrieval_source = "joblib (Phase 1 fallback)"
+    # ── Retrieval: Qdrant primary, joblib fallback ────────────────────────────────
+    if qdrant_client is not None:
+        hits = retrieve_from_qdrant(qdrant_client, query_vector)
+        retrieval_source = "Qdrant Cloud"
+    else:
+        hits = retrieve_from_joblib(query_vector)
+        retrieval_source = "joblib (Phase 1 fallback)"
 
-print(f"[Retrieval] Source: {retrieval_source} | Chunks returned: {len(hits)}")
+    print(f"[Retrieval] Source: {retrieval_source} | Chunks returned: {len(hits)}")
 
-if not hits:
-    print("\n[WARN] No chunks retrieved. Is the collection populated? Run preprocess_json.py first.")
-    exit(0)
+    if not hits:
+        print("\n[WARN] No chunks retrieved. Is the collection populated? Run preprocess_json.py first.")
+        exit(0)
 
-# ── Print top hit summary ──────────────────────────────────────────────────────
-print("\nTop results:")
-for i, h in enumerate(hits, 1):
-    mins, secs = divmod(int(h["start"]), 60)
-    print(f"  {i}. [Score {h['score']:.3f}] Video {h['number']}: {h['title']} @ {mins}:{secs:02d}")
+    # ── Print top hit summary ──────────────────────────────────────────────────────
+    print("\nTop results:")
+    for i, h in enumerate(hits, 1):
+        mins, secs = divmod(int(h["start"]), 60)
+        print(f"  {i}. [Score {h['score']:.3f}] Video {h['number']}: {h['title']} @ {mins}:{secs:02d}")
 
-# ── Build and send prompt ──────────────────────────────────────────────────────
-prompt = build_rag_prompt(incoming_query, hits)
+    # ── Build and send prompt ──────────────────────────────────────────────────────
+    prompt = build_rag_prompt(incoming_query, hits)
 
-with open("prompt.txt", "w", encoding="utf-8") as f:
-    f.write(prompt)
+    with open("prompt.txt", "w", encoding="utf-8") as f:
+        f.write(prompt)
 
-response = inference(prompt)["response"]
-print(f"\n{response}")
+    response = inference(prompt)["response"]
+    print(f"\n{response}")
 
-with open("response.txt", "w", encoding="utf-8") as f:
-    f.write(response)
+    with open("response.txt", "w", encoding="utf-8") as f:
+        f.write(response)

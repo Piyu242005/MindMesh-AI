@@ -17,6 +17,10 @@ from pathlib import Path
 from dotenv import load_dotenv
 from sentence_transformers import SentenceTransformer
 import qdrant_helper as qh
+import sys
+if str(Path(__file__).parent) not in sys.path:
+    sys.path.insert(0, str(Path(__file__).parent))
+from backend.telegram_helper import send_notification
 
 # ── Phase 1 fallback — remove in Phase 3 ─────────────────────────────────────
 import pandas as pd
@@ -144,3 +148,5 @@ print(f"  Files processed  : {len(json_files)}")
 print(f"  Qdrant upload    : {'[OK] done' if qdrant_client else '[ERR] skipped (offline)'}")
 print(f"  Joblib fallback  : [OK] saved")
 print("=" * 55)
+
+send_notification(f"✅ <b>Qdrant Indexing Complete</b>\n\nChunks Indexed: {len(all_texts)}\nFiles Processed: {len(json_files)}")

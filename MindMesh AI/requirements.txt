@@ -15,7 +15,11 @@ faster-whisper>=1.0.0           # Audio transcription (upload center)
 # ffmpeg required as system dependency — see below
 
 # ── Streamlit App ─────────────────────────────────────────────────────────────
-streamlit>=1.35.0               # Multipage app framework
+streamlit==1.39.0               # Multipage app framework
+
+# ── Telegram Webhook Backend ──────────────────────────────────────────────────
+fastapi
+uvicorn
 plotly>=5.20.0                  # Interactive charts (analytics page)
 
 # ── HTTP / LLM ────────────────────────────────────────────────────────────────

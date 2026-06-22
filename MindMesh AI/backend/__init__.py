@@ -16,7 +16,9 @@ if str(_ROOT) not in sys.path:
     sys.path.insert(0, str(_ROOT))
 
 
-def verify_system() -> Dict[str, Tuple[str, str, str]]:
+from backend.telegram_helper import send_admin_alert
+
+def verify_system(alert_on_error: bool = False) -> Dict[str, Tuple[str, str, str]]:
     """
     Run all dependency and environment checks.
 
@@ -109,5 +111,10 @@ def verify_system() -> Dict[str, Tuple[str, str, str]]:
         else:
             results[f"Env: {var}"] = ("error", "Missing",
                                       "Add to .env file (see .env.example)")
+
+    if alert_on_error:
+        errors = [k for k, v in results.items() if v[0] == "error"]
+        if errors:
+            send_admin_alert(f"System Check Failed for:\n" + "\n".join(f"- {e}" for e in errors))
 
     return results

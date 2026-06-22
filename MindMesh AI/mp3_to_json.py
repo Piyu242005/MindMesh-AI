@@ -2,6 +2,14 @@ import os
 import json
 import torch
 from faster_whisper import WhisperModel
+import sys
+from pathlib import Path
+
+# Ensure backend module is available
+ROOT = Path(__file__).parent
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+from backend.telegram_helper import send_notification
 
 # Hardware detection
 device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -42,3 +50,6 @@ for audio in audios:
 
         with open(f"jsons/{audio}.json", "w", encoding="utf-8") as f:
             json.dump(chunks_with_metadata, f, ensure_ascii=False, indent=2)
+
+        # Telegram Notification
+        send_notification(f"✅ <b>Transcription Completed</b>\n\nCourse: {title}\nChunks Generated: {len(chunks)}")
