@@ -1,10 +1,17 @@
 import os
+import sys
+import traceback
+import asyncio
 from pathlib import Path
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI, Request
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
+
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 load_dotenv()
 
@@ -13,14 +20,43 @@ ROOT = Path(__file__).parent
 STATIC_DIR = ROOT / "static"
 TEMPLATES_DIR = ROOT / "templates"
 
-# Create directories if they don't exist
 for d in [STATIC_DIR, TEMPLATES_DIR, ROOT / "videos", ROOT / "audios", ROOT / "jsons"]:
     d.mkdir(parents=True, exist_ok=True)
 
-# Initialize FastAPI
-app = FastAPI(title="MindMesh AI", version="1.0")
+# ── Telegram Integrations ──────────────────────────────────────────────────
+from backend.telegram.notifications import send_startup_alert, send_shutdown_alert, send_error_alert
+from backend.telegram.health_monitor import check_website_health, check_system_resources, run_daily_analytics
+from backend.telegram.security import SecurityMonitoringMiddleware
+from backend.telegram.bot import start_polling
+from backend.telegram.commands import process_telegram_message
 
-# Setup CORS
+# ── APScheduler Setup ──────────────────────────────────────────────────────
+scheduler = AsyncIOScheduler()
+scheduler.add_job(check_website_health, 'interval', minutes=int(os.getenv("MONITOR_INTERVAL_MINUTES", "5")))
+scheduler.add_job(check_system_resources, 'interval', minutes=5)
+scheduler.add_job(run_daily_analytics, 'cron', hour=int(os.getenv("DAILY_REPORT_HOUR", "9")), minute=0)
+
+# ── Lifespan Events ────────────────────────────────────────────────────────
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Startup
+    send_startup_alert()
+    scheduler.start()
+    
+    # Start long polling if not strictly using webhook
+    webhook_url = os.getenv("TELEGRAM_WEBHOOK_URL", "")
+    if not webhook_url:
+        asyncio.create_task(start_polling(process_telegram_message))
+        
+    yield
+    # Shutdown
+    send_shutdown_alert()
+    scheduler.shutdown()
+
+# ── FastAPI Initialization ─────────────────────────────────────────────────
+app = FastAPI(title="MindMesh AI", version="1.0", lifespan=lifespan)
+
+# ── Middlewares ────────────────────────────────────────────────────────────
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -28,14 +64,25 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+app.add_middleware(SecurityMonitoringMiddleware)
 
-# Mount static files
+# ── Exception Handler ──────────────────────────────────────────────────────
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception):
+    error_detail = "".join(traceback.format_exception(type(exc), exc, exc.__traceback__))
+    send_error_alert(
+        service="FastAPI Application",
+        route=request.url.path,
+        error=repr(exc)
+    )
+    # Reraise or return 500 response
+    from fastapi.responses import JSONResponse
+    return JSONResponse(status_code=500, content={"message": "Internal Server Error"})
+
+# ── Mounts & Routes ────────────────────────────────────────────────────────
 app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
-
-# Setup Jinja2 templates
 templates = Jinja2Templates(directory=str(TEMPLATES_DIR))
 
-# Import routes
 from routes import dashboard, upload, chat, settings
 app.include_router(dashboard.router)
 app.include_router(upload.router)
@@ -46,7 +93,17 @@ app.include_router(settings.router)
 async def health_check():
     return {"status": "ok"}
 
+@app.post("/api/telegram/webhook")
+async def telegram_webhook(request: Request):
+    try:
+        data = await request.json()
+        if "message" in data:
+            await process_telegram_message(data["message"])
+    except Exception as e:
+        pass
+    return {"status": "ok"}
+
 if __name__ == "__main__":
     import uvicorn
     port = int(os.environ.get("PORT", 8000))
-    uvicorn.run("main:app", host="0.0.0.0", port=port, reload=True)
+    uvicorn.run("main:app", host="0.0.0.0", port=port, reload=False)

@@ -46,6 +46,10 @@ def _update_metrics(provider: str, model: str, duration: float, tokens: int = 0)
     _cli_metrics["total_requests"] += 1
     _cli_metrics["total_tokens"] += tokens
     _cli_metrics["response_times"].append(duration)
+    
+    # Telegram Analytics
+    from backend.telegram.analytics import AnalyticsStore
+    AnalyticsStore.add_query(provider, duration)
 
 
 # ── Health Checks ────────────────────────────────────────────────────────────

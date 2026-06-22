@@ -72,6 +72,13 @@ async def handle_upload(
         
     background_tasks.add_task(process_upload_task, file_path, video_number, video_title)
     
+    # Telegram Alert
+    from backend.telegram.notifications import send_upload_alert
+    from backend.telegram.analytics import AnalyticsStore
+    size_mb = 0 if not content_length else int(content_length) / (1024 * 1024)
+    send_upload_alert(file.filename, size_mb)
+    AnalyticsStore.add_upload()
+    
     return HTMLResponse(
         "<div class='text-green-500 font-medium'>Upload successful! Video is processing in the background...</div>"
     )

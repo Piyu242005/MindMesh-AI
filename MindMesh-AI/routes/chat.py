@@ -35,6 +35,9 @@ async def chat_endpoint(request: Request, query: str = Form(...)):
         score_threshold=score_threshold
     )
     
+    from backend.telegram.analytics import AnalyticsStore
+    AnalyticsStore.add_search()
+    
     prompt = build_rag_prompt(query, hits)
     
     from backend.llm_manager import generate_response
