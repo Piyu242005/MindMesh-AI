@@ -65,6 +65,8 @@ _defaults = {
     "response_times":        [],   # list of float seconds
     "query_timestamps":      [],   # list of ISO timestamp strings
     "popular_topics":        {},   # word → count
+    # Onboarding
+    "onboarding_completed":  False,
     # Misc
     "last_system_check":     None,
 }
@@ -77,6 +79,7 @@ _pg = st.navigation(
     {
         "🏠 Overview": [
             st.Page("pages/dashboard.py",      title="Dashboard",      icon="📊", default=True),
+            st.Page("pages/getting_started.py",title="Getting Started",icon="📚"),
         ],
         "📚 Content": [
             st.Page("pages/upload_center.py",  title="Upload Center",  icon="📤"),
@@ -109,6 +112,16 @@ with st.sidebar:
         Built by Piyush Ramteke
         </div>""", unsafe_allow_html=True
     )
+    
+    st.markdown("<br/>", unsafe_allow_html=True)
+    if st.button("❓ How It Works", use_container_width=True):
+        st.session_state["onboarding_completed"] = False
+        st.rerun()
+
+# ── Trigger Onboarding Modal ──────────────────────────────────────────────────
+if not st.session_state.get("onboarding_completed", False):
+    from components.onboarding_modal import show_onboarding
+    show_onboarding()
 
 # ── Run selected page ─────────────────────────────────────────────────────────
 _pg.run()

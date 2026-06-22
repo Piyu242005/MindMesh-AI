@@ -30,6 +30,35 @@ with col_text:
     """, unsafe_allow_html=True)
 st.divider()
 
+# ── Empty State Check ──────────────────────────────────────────────────────────
+jsons_dir   = _ROOT / "jsons"
+json_files  = list(jsons_dir.glob("*.json")) if jsons_dir.exists() else []
+total_chunks = 0
+for jf in json_files:
+    try:
+        import json
+        d = json.loads(jf.read_text(encoding="utf-8"))
+        total_chunks += len(d.get("chunks", []))
+    except Exception:
+        pass
+
+if len(json_files) == 0:
+    st.markdown("""
+    <div class="mm-card" style="text-align: center; padding: 40px; margin-bottom: 20px; border: 1px solid var(--primary-color);">
+        <h2 style="margin-top:0;">🧠 Welcome to MindMesh AI</h2>
+        <p style="color: var(--text-2); font-size: 1.1rem; margin-bottom: 20px;">
+            Your AI-powered learning assistant is ready.<br/>
+            Upload a course to transform videos into a searchable knowledge network.
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    _, col_btn, _ = st.columns([1, 1, 1])
+    with col_btn:
+        if st.button("📤 Upload First Course", type="primary", use_container_width=True):
+            st.switch_page("pages/upload_center.py")
+    st.divider()
+
 # ── Live Qdrant metrics ───────────────────────────────────────────────────────
 qdrant_client, qdrant_err = get_qdrant_client()
 qdrant_ok = qdrant_client is not None
@@ -41,18 +70,6 @@ if qdrant_ok:
 else:
     vec_count  = 0
     col_status = "Offline"
-
-# Count courses (JSON files)
-jsons_dir   = _ROOT / "jsons"
-json_files  = list(jsons_dir.glob("*.json")) if jsons_dir.exists() else []
-total_chunks = 0
-for jf in json_files:
-    try:
-        import json
-        d = json.loads(jf.read_text(encoding="utf-8"))
-        total_chunks += len(d.get("chunks", []))
-    except Exception:
-        pass
 
 # Count metrics from session state
 metrics = st.session_state.get("llm_metrics", {"total_requests": 0, "total_tokens": 0, "response_times": []})
