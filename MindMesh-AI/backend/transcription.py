@@ -19,7 +19,7 @@ if str(_ROOT) not in sys.path:
     sys.path.insert(0, str(_ROOT))
 
 
-# ── Whisper model (cached — loaded once per Streamlit session) ────────────────
+# ── Whisper model (cached — loaded once globally) ─────────────────────────────
 
 @functools.lru_cache(maxsize=1)
 def get_whisper_model(model_size: str = "medium"):

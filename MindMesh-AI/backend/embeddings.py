@@ -23,7 +23,7 @@ EMBED_MODEL_NAME = "BAAI/bge-small-en-v1.5"
 EMBED_BATCH_SIZE = 64
 
 
-# ── Model (cached per Streamlit session) ──────────────────────────────────────
+# ── Model (cached globally) ───────────────────────────────────────────────────
 
 @functools.lru_cache(maxsize=1)
 def get_embedding_model():
@@ -32,7 +32,7 @@ def get_embedding_model():
     return SentenceTransformer(EMBED_MODEL_NAME)
 
 
-# ── Qdrant client (cached per Streamlit session) ──────────────────────────────
+# ── Qdrant client (cached globally) ───────────────────────────────────────────
 
 @functools.lru_cache(maxsize=1)
 def get_qdrant_client():

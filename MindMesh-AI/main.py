@@ -89,7 +89,16 @@ async def global_exception_handler(request: Request, exc: Exception):
 
 # ── Mounts & Routes ────────────────────────────────────────────────────────
 app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
-app.mount("/assets", StaticFiles(directory=str(ROOT / "assets")), name="assets")
+app.mount("/assets", StaticFiles(directory=str(ASSETS_DIR)), name="assets")
+
+@app.get("/health")
+def health():
+    return {
+        "status": "healthy",
+        "service": "MindMesh AI"
+    }
+
+# ── Routers ───────────────────────────────────────────────────────────────────
 templates = Jinja2Templates(directory=str(TEMPLATES_DIR))
 
 from routes import dashboard, upload, chat, settings

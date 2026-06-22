@@ -2,5 +2,32 @@
   "Elaborate on the foundational principles and comprehensive definition of web development, outlining the essential technologies, programming languages, and frameworks used in building interactive websites and dynamic web applications. Include explanations of frontend and backend development, database integration, and the typical workflow or stages involved in creating and deploying web-based solutions from concept to launch within a professional context.": {
     "timestamp": 1782153198.980913,
     "results": []
+  },
+  "Provide a comprehensive, in-depth explanation detailing the foundational concepts and entire scope of web development, including the core technologies and programming languages involved in creating dynamic web applications, the distinction between client-side (front-end) and server-side (back-end) development, and an overview of the typical roles and processes, from initial design to deployment and maintenance.": {
+    "timestamp": 1782154094.6383886,
+    "results": [
+      {
+        "title": "Learn web development - MDN",
+        "href": "https://developer.mozilla.org/en-US/docs/Learn_web_development",
+        "body": "Oct 29, 2025 \u00b7 Welcome to MDN Learning Web Development (also known as Learn). This resource provides a structured set of tutorials \u2026",
+        "trust_score": 8
+      },
+      {
+        "title": "Web Development Technologies - GeeksforGeeks",
+        "href": "https://www.geeksforgeeks.org/web-tech/web-technology/",
+        "body": "May 15, 2026 \u00b7 Web development is the process of creating and maintaining websites and web applications that run on the internet. Users \u2026",
+        "trust_score": 5
+      },
+      {
+        "title": "Learn Web Development Basics with HTML CSS and JavaScript",
+        "href": "https://www.geeksforgeeks.org/javascript/learn-web-development-basics-with-html-css-and-javascript/",
+        "body": "Jul 23, 2025 \u00b7 Web development refers to the creating, building, and maintaining of websites. It includes aspects such as web design, web publishing, web programming, and database management. It is the creation of an application that works over the internet i.e. websites. The word Web Development is made up of two words, that is: Web: It refers to websites, web pages, or anything that works over the internet. Development: It refers to building the application from scratch.",
+        "trust_score": 5
+      }
+    ]
+  },
+  "Provide a comprehensive overview of web development, elucidating its fundamental principles, the essential technologies and programming languages involved (such as HTML, CSS, JavaScript, server-side languages, and database systems), the critical distinction between client-side (frontend) and server-side (backend) components, and the common methodologies or processes for building and deploying interactive web applications.": {
+    "timestamp": 1782154455.2291605,
+    "results": []
   }
 }

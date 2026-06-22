@@ -24,6 +24,16 @@ async def chat_page(request: Request):
 
 @router.post("/api/chat")
 def chat_endpoint(request: Request, query: str = Form(...), conversation_id: str = Form(None)):
+    try:
+        return _chat_endpoint_internal(request, query, conversation_id)
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        def err_gen():
+            yield f"data: Sorry, an error occurred.<br><br><small>{str(e)}</small>\n\n"
+        return StreamingResponse(err_gen(), media_type="text/event-stream")
+
+def _chat_endpoint_internal(request: Request, query: str, conversation_id: str):
     from backend.memory import (
         create_conversation, get_chat_history, add_message, 
         generate_conversation_title, update_conversation_title,
@@ -62,6 +72,9 @@ def chat_endpoint(request: Request, query: str = Form(...), conversation_id: str
     else:
         optimized_query = rewrite_query(query)
 
+    print(f"DEBUG: Incoming Question: {query}")
+    print(f"DEBUG: Optimized Query: {optimized_query}")
+
     # 1. Retrieve
     embed_model = get_embedding_model()
     q_client, _ = get_qdrant_client()
@@ -79,11 +92,15 @@ def chat_endpoint(request: Request, query: str = Form(...), conversation_id: str
         score_threshold=score_threshold
     )
     confidence = retrieval_result.get("confidence", "Medium")
+    print(f"DEBUG: Confidence Score: {confidence}")
+    print(f"DEBUG: Retrieved Course Chunks Count: {len(retrieval_result.get('course_hits', []))}")
+    print(f"DEBUG: Retrieved Web Hits Count: {len(retrieval_result.get('web_hits', []))}")
     
     from backend.telegram.analytics import AnalyticsStore
     AnalyticsStore.add_search()
     
     prompt = build_rag_prompt(optimized_query, retrieval_result, chat_history=chat_history, summary=summary)
+    print(f"DEBUG: LLM Request Prompt length: {len(prompt)}")
     
     from backend.llm_manager import generate_response
     provider = os.getenv("LLM_PROVIDER", "groq") # Default to Groq for speed

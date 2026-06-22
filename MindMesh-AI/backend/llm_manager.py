@@ -32,7 +32,7 @@ else:
     groq_client = None
 
 # ── Tracking Defaults ────────────────────────────────────────────────────────
-# Metrics tracking: populated in session_state if running in Streamlit,
+# Metrics tracking: populated in global state for Dashboard display
 # or kept in memory for CLI usage.
 _cli_metrics = {
     "total_requests": 0,
