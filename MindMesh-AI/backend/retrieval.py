@@ -103,36 +103,94 @@ def retrieve_from_joblib(
         return [], False
 
 
+import functools
+
+@functools.lru_cache(maxsize=1)
+def get_cross_encoder():
+    from sentence_transformers import CrossEncoder
+    return CrossEncoder('cross-encoder/ms-marco-MiniLM-L-6-v2')
+
+def rewrite_query(query: str) -> str:
+    """Rewrite query for optimal semantic search."""
+    prompt = f"""You are an educational search assistant.
+Rewrite the following user query to be highly descriptive and optimized for a semantic vector search across a web development course transcript. 
+Do not add introductory phrases. Just output the rewritten query.
+Original Query: {query}"""
+    
+    provider = os.getenv("LLM_PROVIDER", "gemini")
+    model_name = os.getenv("GEMINI_MODEL", "gemini-2.5-flash") if provider == "gemini" else os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile")
+    
+    try:
+        rewritten = generate_sync(prompt, model_name, provider=provider)
+        return rewritten.strip()
+    except Exception:
+        return query
+
 def retrieve(
     embed_model,
     query: str,
     qdrant_client,
     top_k: int = 5,
     score_threshold: float = 0.0,
-) -> Tuple[List[Dict[str, Any]], str]:
+) -> Tuple[List[Dict[str, Any]], str, str]:
     """
     Primary retrieval: try Qdrant, fall back to joblib.
-    Returns (hits, source_label).
+    Uses CrossEncoder reranking.
+    Returns (hits, source_label, confidence).
     """
     from backend.embeddings import embed_single
 
     vec = embed_single(query, embed_model)
+    
+    # Increase initial retrieval to top 20
+    initial_k = 20
 
     if qdrant_client is not None:
         try:
-            hits = retrieve_from_qdrant(qdrant_client, vec, top_k, score_threshold)
-            return hits, "Qdrant Cloud"
+            hits = retrieve_from_qdrant(qdrant_client, vec, initial_k, score_threshold)
+            source_label = "Qdrant Cloud"
         except Exception:
-            pass
+            hits, ok = retrieve_from_joblib(vec, initial_k)
+            source_label = "Local (joblib)" if ok else "No data source"
+    else:
+        hits, ok = retrieve_from_joblib(vec, initial_k)
+        source_label = "Local (joblib)" if ok else "No data source"
 
-    hits, ok = retrieve_from_joblib(vec, top_k)
-    return hits, ("Local (joblib)" if ok else "No data source")
+    if not hits:
+        return [], source_label, "Low"
+
+    # Reranking using CrossEncoder
+    try:
+        cross_encoder = get_cross_encoder()
+        pairs = [[query, h.get("text", "")] for h in hits]
+        scores = cross_encoder.predict(pairs)
+        
+        for idx, score in enumerate(scores):
+            hits[idx]["cross_score"] = float(score)
+            
+        hits = sorted(hits, key=lambda x: x["cross_score"], reverse=True)
+        hits = hits[:top_k]
+        
+        avg_score = sum(h["cross_score"] for h in hits) / len(hits)
+        # Empirical thresholds for ms-marco cross encoders
+        if avg_score > 3.0:
+            confidence = "High"
+        elif avg_score > 0.0:
+            confidence = "Medium"
+        else:
+            confidence = "Low"
+    except Exception as e:
+        # Fallback if cross encoder fails
+        hits = hits[:top_k]
+        confidence = "Medium"
+
+    return hits, source_label, confidence
 
 
 # ── Prompt builder ────────────────────────────────────────────────────────────
 
 def build_rag_prompt(query: str, hits: List[Dict[str, Any]]) -> str:
-    """Build the RAG prompt — identical template to process_incoming.py."""
+    """Build the new educational RAG prompt."""
     chunks_json = json.dumps(
         [
             {
@@ -146,13 +204,35 @@ def build_rag_prompt(query: str, hits: List[Dict[str, Any]]) -> str:
         ],
         indent=2,
     )
-    return f'''I am teaching web development in my Sigma Web Development course. Here are video subtitle chunks containing video title, video number, start time in seconds, end time in seconds, the text at that time:
+    return f'''You are MindMesh AI, an educational AI assistant teaching web development.
 
+Your job is to answer the user's question using the provided course content.
+
+Rules:
+1. First provide a direct and complete answer.
+2. Explain concepts in simple language.
+3. Do not only list source chunks.
+4. If multiple chunks contain partial information, combine them into one coherent explanation.
+5. Only show sources after the answer.
+6. If the answer is not fully available in the course content, use the retrieved context and clearly state that the explanation is inferred from the course material.
+7. Never respond with only timestamps or video references.
+8. Format responses as:
+
+Answer:
+[Detailed explanation]
+
+Key Points:
+• Point 1
+• Point 2
+• Point 3
+
+Sources:
+• Video Name (timestamp)
+
+Course Content Chunks:
 {chunks_json}
 ---------------------------------
-"{query}"
-User asked this question related to the video chunks, you have to answer in a human way (dont mention the above format, its just for you) where and how much content is taught in which video (in which video and at what timestamp) and guide the user to go to that particular video. If user asks unrelated question, tell him that you can only answer questions related to the course
-'''
+User Question: "{query}"'''
 
 
 # ── LLM inference (via LLM Manager) ──────────────────────────────────────────

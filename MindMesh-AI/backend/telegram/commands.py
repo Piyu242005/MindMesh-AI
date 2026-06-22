@@ -62,22 +62,27 @@ async def handle_command(text: str, chat_id: str):
 
 async def handle_ai_query(text: str, chat_id: str):
     """Processes RAG query via LLM Manager."""
+    from backend.retrieval import retrieve, rewrite_query
     try:
         start_time = time.time()
+        optimized_query = rewrite_query(text)
+        
         q_client, _ = get_qdrant_client()
         embed_model = get_embedding_model()
-        query_vector = embed_single(text, embed_model)
         
-        if q_client:
-            hits = retrieve_from_qdrant(q_client, query_vector)
-        else:
-            hits = retrieve_from_joblib(query_vector)
+        hits, source_label, confidence = retrieve(
+            embed_model=embed_model,
+            query=optimized_query,
+            qdrant_client=q_client,
+            top_k=5,
+            score_threshold=0.0
+        )
 
         if not hits:
             send_message("⚠️ No source context found.", chat_id)
             return
 
-        prompt = build_rag_prompt(text, hits)
+        prompt = build_rag_prompt(optimized_query, hits)
         
         # Use existing LLM manager with built-in Gemini -> Groq failover
         provider = os.getenv("LLM_PROVIDER", "gemini")
@@ -86,9 +91,8 @@ async def handle_ai_query(text: str, chat_id: str):
         answer = generate_response(prompt, provider=provider, model_name=model, stream=False)
         
         # Format response
-        top_hit = hits[0]
-        mins, secs = divmod(int(top_hit.get("start", 0)), 60)
-        source_ref = f"\n\n📚 <b>Source:</b> Video {top_hit.get('number', '?')}\n⏱️ <b>Timestamp:</b> {mins}:{secs:02d}"
+        conf_icon = "🟢" if confidence == "High" else "🟡" if confidence == "Medium" else "🔴"
+        source_ref = f"\n\n{conf_icon} <b>Confidence:</b> {confidence}"
         
         # Log to analytics
         duration = time.time() - start_time

@@ -7,7 +7,7 @@ import json
 
 from backend import qdrant_helper as qh
 from backend.embeddings import get_embedding_model, get_qdrant_client
-from backend.retrieval import retrieve, build_rag_prompt
+from backend.retrieval import retrieve, build_rag_prompt, rewrite_query
 
 router = APIRouter()
 TEMPLATES_DIR = Path(__file__).parent.parent / "templates"
@@ -19,6 +19,9 @@ async def chat_page(request: Request):
 
 @router.post("/api/chat")
 async def chat_endpoint(request: Request, query: str = Form(...)):
+    # 0. Query Rewriting
+    optimized_query = rewrite_query(query)
+
     # 1. Retrieve
     embed_model = get_embedding_model()
     q_client, _ = get_qdrant_client()
@@ -27,9 +30,9 @@ async def chat_endpoint(request: Request, query: str = Form(...)):
     top_k = 5
     score_threshold = 0.0
     
-    hits, source_label = retrieve(
+    hits, source_label, confidence = retrieve(
         embed_model=embed_model,
-        query=query,
+        query=optimized_query,
         qdrant_client=q_client,
         top_k=top_k,
         score_threshold=score_threshold
@@ -38,7 +41,7 @@ async def chat_endpoint(request: Request, query: str = Form(...)):
     from backend.telegram.analytics import AnalyticsStore
     AnalyticsStore.add_search()
     
-    prompt = build_rag_prompt(query, hits)
+    prompt = build_rag_prompt(optimized_query, hits)
     
     from backend.llm_manager import generate_response
     
@@ -48,16 +51,12 @@ async def chat_endpoint(request: Request, query: str = Form(...)):
     stream_gen = generate_response(prompt, provider=provider, model_name=model_name, stream=True)
     
     # We will format the output as SSE (Server-Sent Events) for HTMX
-    # HTMX SSE extension expects events: 'data: <div>...</div>\n\n'
-    
     async def sse_generator():
-        # First send the sources
-        sources_html = "<div class='text-sm text-gray-400 mb-2'><strong>Sources:</strong><ul class='list-disc pl-5'>"
-        for h in hits:
-            sources_html += f"<li>Video {h.get('number', '?')}: {h.get('title', '?')}</li>"
-        sources_html += "</ul></div>"
+        # Display Confidence Indicator
+        conf_icon = "🟢" if confidence == "High" else "🟡" if confidence == "Medium" else "🔴"
+        conf_html = f"<div class='text-sm mb-4 font-semibold text-gray-300'>{conf_icon} Confidence: {confidence}</div>"
         
-        yield f"data: {sources_html}\n\n"
+        yield f"data: {conf_html}\n\n"
         
         for chunk in stream_gen:
             # Simple chunk escaping (basic)
