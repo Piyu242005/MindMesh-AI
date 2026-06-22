@@ -15,7 +15,7 @@
                     colors: {
                         background: '#0A0A0A',
                         panel: '#111111',
-                        accent: '#EF4444' // Red-500
+                        accent: '#FF4D4D'
                     }
                 }
             }
@@ -63,5 +63,160 @@
         {% block content %}{% endblock %}
     </main>
 
+    <!-- Permanent Help Button -->
+    <button onclick="openOnboardingModal()" class="fixed bottom-6 right-6 bg-panel border border-white/10 hover:border-accent hover:text-accent transition-colors px-4 py-3 rounded-full flex items-center gap-2 shadow-lg backdrop-blur-sm z-40">
+        <span class="text-xl">❓</span> How It Works
+    </button>
+
+    <!-- Onboarding Modal (Dialog) -->
+    <dialog id="onboardingModal" class="bg-transparent m-auto p-0 z-50 backdrop:bg-black/80 backdrop:backdrop-blur-sm open:animate-in open:fade-in open:zoom-in-95 duration-200">
+        <div class="bg-panel border border-white/10 rounded-2xl w-full max-w-2xl text-gray-200 shadow-2xl overflow-hidden flex flex-col max-h-[85vh]">
+            
+            <!-- Header -->
+            <div class="p-6 border-b border-white/5 bg-gradient-to-r from-background to-panel sticky top-0 z-10 flex justify-between items-start">
+                <div>
+                    <h2 class="text-2xl font-bold flex items-center gap-2">
+                        <span>🧠</span> MindMesh AI
+                    </h2>
+                    <p class="text-gray-400 mt-1">Transform Video Courses into an Intelligent AI Knowledge Base</p>
+                </div>
+                <button onclick="closeOnboardingModal()" class="text-gray-500 hover:text-white transition-colors p-1">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+
+            <!-- Scrollable Content -->
+            <div class="p-8 overflow-y-auto space-y-8">
+                
+                <section>
+                    <h3 class="text-accent font-bold uppercase tracking-wider text-sm mb-3">What is MindMesh AI?</h3>
+                    <p class="text-gray-300 leading-relaxed">
+                        MindMesh AI converts educational videos into a searchable AI-powered knowledge system. 
+                        Instead of watching hours of lectures, simply ask questions and receive precise answers with source references and timestamps.
+                    </p>
+                </section>
+
+                <section>
+                    <h3 class="text-accent font-bold uppercase tracking-wider text-sm mb-4">How It Works</h3>
+                    <div class="space-y-4">
+                        <div class="flex gap-4 p-4 rounded-xl bg-white/5 border border-white/5">
+                            <div class="text-2xl">📹</div>
+                            <div>
+                                <h4 class="font-bold text-white">Step 1: Upload Course Videos</h4>
+                                <p class="text-sm text-gray-400 mt-1">Upload MP4 educational content.</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-4 p-4 rounded-xl bg-white/5 border border-white/5">
+                            <div class="text-2xl">🎙️</div>
+                            <div>
+                                <h4 class="font-bold text-white">Step 2: AI Transcription</h4>
+                                <p class="text-sm text-gray-400 mt-1">Faster-Whisper converts speech into structured text.</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-4 p-4 rounded-xl bg-white/5 border border-white/5">
+                            <div class="text-2xl">🧩</div>
+                            <div>
+                                <h4 class="font-bold text-white">Step 3: Smart Chunking & Embeddings</h4>
+                                <p class="text-sm text-gray-400 mt-1">Content is segmented and converted into semantic embeddings.</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-4 p-4 rounded-xl bg-white/5 border border-white/5">
+                            <div class="text-2xl">☁️</div>
+                            <div>
+                                <h4 class="font-bold text-white">Step 4: Stored in Qdrant Cloud</h4>
+                                <p class="text-sm text-gray-400 mt-1">Embeddings are indexed for lightning-fast retrieval.</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-4 p-4 rounded-xl bg-white/5 border border-white/5">
+                            <div class="text-2xl">🤖</div>
+                            <div>
+                                <h4 class="font-bold text-white">Step 5: Ask Questions</h4>
+                                <p class="text-sm text-gray-400 mt-1">Use Gemini or Groq to chat with your course content.</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section>
+                    <h3 class="text-accent font-bold uppercase tracking-wider text-sm mb-3">Example Questions</h3>
+                    <div class="bg-background border border-white/10 rounded-lg p-4 font-mono text-sm text-gray-300 space-y-2">
+                        <p>What is Flexbox?</p>
+                        <p>Explain Python decorators.</p>
+                        <p>Where was SQL JOIN explained?</p>
+                        <p>What is Retrieval-Augmented Generation?</p>
+                        <p>Summarize Chapter 3.</p>
+                    </div>
+                </section>
+
+                <section>
+                    <h3 class="text-accent font-bold uppercase tracking-wider text-sm mb-3">Key Features</h3>
+                    <ul class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-gray-300">
+                        <li class="flex items-center gap-2">✅ AI-Powered Search</li>
+                        <li class="flex items-center gap-2">✅ Video-to-Knowledge Conversion</li>
+                        <li class="flex items-center gap-2">✅ Source Citations & Timestamps</li>
+                        <li class="flex items-center gap-2">✅ Multi-LLM Support (Gemini + Groq)</li>
+                        <li class="flex items-center gap-2">✅ Qdrant Semantic Search</li>
+                        <li class="flex items-center gap-2">✅ Faster-Whisper Transcription</li>
+                    </ul>
+                </section>
+                
+                <section class="p-4 bg-accent/10 border border-accent/20 rounded-xl">
+                    <h3 class="text-accent font-bold text-sm mb-1">Important Note</h3>
+                    <p class="text-sm text-gray-300">MindMesh AI only answers based on uploaded course content, helping reduce hallucinations and improve answer accuracy.</p>
+                </section>
+            </div>
+
+            <!-- Footer / Actions -->
+            <div class="p-6 border-t border-white/5 bg-background flex flex-col sm:flex-row gap-4 justify-end sticky bottom-0">
+                <a href="https://github.com/Piyu242005/MindMesh-AI" target="_blank" class="px-6 py-3 rounded-lg border border-white/10 hover:bg-white/5 transition-colors text-center font-medium">
+                    📖 View Documentation
+                </a>
+                <button onclick="closeAndSaveOnboarding()" class="px-6 py-3 rounded-lg bg-accent hover:bg-red-600 transition-colors text-white text-center font-bold shadow-lg shadow-accent/20">
+                    🚀 Got It, Let's Explore
+                </button>
+            </div>
+        </div>
+    </dialog>
+
+    <script>
+        const modal = document.getElementById('onboardingModal');
+
+        function openOnboardingModal() {
+            modal.showModal();
+        }
+
+        function closeOnboardingModal() {
+            modal.close();
+        }
+
+        function closeAndSaveOnboarding() {
+            localStorage.setItem("mindmesh_onboarding_completed", "true");
+            modal.close();
+        }
+
+        // Check state on load
+        document.addEventListener("DOMContentLoaded", () => {
+            const isCompleted = localStorage.getItem("mindmesh_onboarding_completed");
+            if (!isCompleted) {
+                // Slight delay for smooth entrance after page load
+                setTimeout(() => {
+                    openOnboardingModal();
+                }, 500);
+            }
+        });
+
+        // Close on clicking outside the dialog
+        modal.addEventListener('click', (e) => {
+            const dialogDimensions = modal.getBoundingClientRect();
+            if (
+                e.clientX < dialogDimensions.left ||
+                e.clientX > dialogDimensions.right ||
+                e.clientY < dialogDimensions.top ||
+                e.clientY > dialogDimensions.bottom
+            ) {
+                closeOnboardingModal();
+            }
+        });
+    </script>
 </body>
 </html>
