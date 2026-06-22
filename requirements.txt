@@ -1,0 +1,41 @@
+# MindMesh AI — Python Dependencies
+# Install: pip install -r requirements.txt
+
+# ── Vector Database ───────────────────────────────────────────────────────────
+qdrant-client>=1.9.0            # Qdrant Cloud SDK (primary vector store)
+
+# ── Environment ───────────────────────────────────────────────────────────────
+python-dotenv>=1.0.0            # Secure .env loading
+
+# ── Embeddings ────────────────────────────────────────────────────────────────
+sentence-transformers>=2.7.0    # BAAI/bge-small-en-v1.5 (384-dim)
+
+# ── Transcription ─────────────────────────────────────────────────────────────
+faster-whisper>=1.0.0           # Audio transcription (upload center)
+# ffmpeg required as system dependency — see below
+
+# ── Streamlit App ─────────────────────────────────────────────────────────────
+streamlit==1.39.0               # Multipage app framework
+
+# ── Telegram Webhook Backend ──────────────────────────────────────────────────
+fastapi
+uvicorn
+plotly>=5.20.0                  # Interactive charts (analytics page)
+
+# ── HTTP / LLM ────────────────────────────────────────────────────────────────
+requests>=2.31.0                # Ollama inference + streaming
+google-generativeai>=0.8.0      # Gemini API
+groq>=0.11.0                    # Groq API
+
+# ── Data (Phase 1 fallback — remove in Phase 3) ───────────────────────────────
+numpy>=1.24.0
+pandas>=2.0.0
+scikit-learn>=1.3.0             # cosine_similarity (joblib fallback only)
+joblib>=1.3.0                   # embeddings.joblib rollback
+
+# ── System Requirements (install separately) ──────────────────────────────────
+# ffmpeg   — Windows: https://www.gyan.dev/ffmpeg/builds/
+#            Linux  : sudo apt install ffmpeg
+#            macOS  : brew install ffmpeg
+# ollama   — https://ollama.com/download
+#            After install: ollama pull llama3.2
