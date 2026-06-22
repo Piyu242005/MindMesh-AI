@@ -37,8 +37,19 @@ with col_ret:
     src = "Qdrant Cloud" if qdrant_ok else "Local (joblib)"
     st.markdown(f'<span class="mm-badge {"mm-badge-ok" if qdrant_ok else "mm-badge-warn"}">● Retrieval: {src}</span>', unsafe_allow_html=True)
 with col_llm:
-    ollama_up = ret.is_ollama_running()
-    st.markdown(f'<span class="mm-badge {"mm-badge-ok" if ollama_up else "mm-badge-err"}">● LLM: {st.session_state.selected_model}</span>', unsafe_allow_html=True)
+    from backend.llm_manager import check_providers
+    llm_status = check_providers()
+    provider = st.session_state.get("llm_provider", "gemini")
+    
+    if provider == "gemini":
+        active_model = st.session_state.get("gemini_model", "gemini-2.5-flash")
+    elif provider == "groq":
+        active_model = st.session_state.get("groq_model", "llama-3.3-70b-versatile")
+    else:
+        active_model = st.session_state.get("selected_model", "llama3.2")
+        
+    is_up = llm_status.get(provider, (False,))[0]
+    st.markdown(f'<span class="mm-badge {"mm-badge-ok" if is_up else "mm-badge-err"}">● {provider.capitalize()}: {active_model}</span>', unsafe_allow_html=True)
 with col_topk:
     st.markdown(f'<span class="mm-badge mm-badge-off">○ Top-K: {st.session_state.top_k}</span>', unsafe_allow_html=True)
 
@@ -58,8 +69,8 @@ if not has_data:
     """)
     st.stop()
 
-if not ollama_up:
-    st.warning("⚠️ Ollama is not running. Responses will fail. Start it: `ollama serve`")
+if not is_up:
+    st.warning(f"⚠️ {provider.capitalize()} is offline or missing API key. Responses will fail.")
 
 # ── Chat history ──────────────────────────────────────────────────────────────
 for msg in st.session_state.chat_history:
@@ -122,7 +133,7 @@ if user_query:
         with st.chat_message("assistant", avatar="🧠"):
             t1 = time.time()
             full_response = st.write_stream(
-                ret.stream_response(prompt, st.session_state.selected_model)
+                ret.stream_response(prompt, model_name=active_model, provider=provider)
             )
             llm_time = time.time() - t1
             total_time = time.time() - t0

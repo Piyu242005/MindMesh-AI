@@ -28,9 +28,15 @@ from sklearn.metrics.pairwise import cosine_similarity
 
 load_dotenv()
 
-TOP_K        = 5
-OLLAMA_URL   = os.getenv("OLLAMA_URL",  "http://localhost:11434/api/generate")
-OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "llama3.2")
+TOP_K = 5
+LLM_PROVIDER = os.getenv("LLM_PROVIDER", "gemini")
+
+if LLM_PROVIDER == "gemini":
+    LLM_MODEL = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
+elif LLM_PROVIDER == "groq":
+    LLM_MODEL = os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile")
+else:
+    LLM_MODEL = os.getenv("OLLAMA_MODEL", "llama3.2")
 
 
 # ── Load embedding model (once) ───────────────────────────────────────────────
@@ -87,13 +93,12 @@ def retrieve_from_joblib(query_vector: list) -> list:
 # ── LLM inference ─────────────────────────────────────────────────────────────
 
 def inference(prompt: str) -> dict:
-    """Call local Ollama LLM. Returns the full JSON response dict."""
-    r = requests.post(
-        OLLAMA_URL,
-        json={"model": OLLAMA_MODEL, "prompt": prompt, "stream": False},
-        timeout=120,
-    )
-    response = r.json()
+    """Call LLM Manager. Returns the full JSON response dict structure for legacy compatibility."""
+    from backend.llm_manager import generate_response
+    
+    text = generate_response(prompt, provider=LLM_PROVIDER, model_name=LLM_MODEL, stream=False)
+    
+    response = {"response": text}
     print(response)
     return response
 

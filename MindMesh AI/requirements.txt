@@ -11,7 +11,7 @@ python-dotenv>=1.0.0            # Secure .env loading
 sentence-transformers>=2.7.0    # BAAI/bge-small-en-v1.5 (384-dim)
 
 # ── Transcription ─────────────────────────────────────────────────────────────
-openai-whisper>=20231117        # Audio transcription (upload center)
+faster-whisper>=1.0.0           # Audio transcription (upload center)
 # ffmpeg required as system dependency — see below
 
 # ── Streamlit App ─────────────────────────────────────────────────────────────
@@ -20,6 +20,8 @@ plotly>=5.20.0                  # Interactive charts (analytics page)
 
 # ── HTTP / LLM ────────────────────────────────────────────────────────────────
 requests>=2.31.0                # Ollama inference + streaming
+google-generativeai>=0.8.0      # Gemini API
+groq>=0.11.0                    # Groq API
 
 # ── Data (Phase 1 fallback — remove in Phase 3) ───────────────────────────────
 numpy>=1.24.0

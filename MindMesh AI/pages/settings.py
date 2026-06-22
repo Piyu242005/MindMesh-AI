@@ -34,38 +34,50 @@ left, right = st.columns([1, 1])
 
 with left:
 
+    from backend.llm_manager import check_providers
+    
     # ── LLM Configuration ──────────────────────────────
     st.subheader("🤖 LLM Configuration")
 
-    ollama_up     = is_ollama_running()
-    pulled_models = get_ollama_models()
+    status = check_providers()
 
-    # Status
-    if ollama_up:
-        st.markdown(f'<span class="mm-badge mm-badge-ok">● Ollama Running · {len(pulled_models)} model(s)</span>', unsafe_allow_html=True)
+    # Provider Selection
+    st.session_state.llm_provider = st.radio(
+        "Active LLM Provider",
+        options=["gemini", "groq", "ollama"],
+        index=["gemini", "groq", "ollama"].index(st.session_state.get("llm_provider", "gemini")),
+        horizontal=True,
+        format_func=lambda x: x.capitalize()
+    )
+    
+    # Show active provider status
+    act_status, act_msg = status.get(st.session_state.llm_provider, (False, "Unknown"))
+    if act_status:
+        st.markdown(f'<span class="mm-badge mm-badge-ok">● {st.session_state.llm_provider.capitalize()} Ready</span>', unsafe_allow_html=True)
     else:
-        st.markdown('<span class="mm-badge mm-badge-err">● Ollama Offline — run `ollama serve`</span>', unsafe_allow_html=True)
+        st.markdown(f'<span class="mm-badge mm-badge-err">● {st.session_state.llm_provider.capitalize()} Offline ({act_msg})</span>', unsafe_allow_html=True)
 
     st.write("")
 
-    # Model selector — prefer pulled models, fallback to common list
-    common_models = ["llama3.2", "llama3.1", "gemma3:4b", "deepseek-r1", "mistral", "phi3", "qwen2.5"]
-    all_models    = list(dict.fromkeys(pulled_models + common_models))  # deduplicate, pulled first
-
-    cur = st.session_state.selected_model
-    idx = all_models.index(cur) if cur in all_models else 0
-
-    st.session_state.selected_model = st.selectbox(
-        "Ollama Model",
-        all_models,
-        index=idx,
-        help="Pulled models appear first. Others can be pulled: `ollama pull <name>`",
-    )
-
-    if st.session_state.selected_model in pulled_models:
-        st.caption(f"✓ `{st.session_state.selected_model}` is available locally")
+    if st.session_state.llm_provider == "gemini":
+        gemini_opts = ["gemini-2.5-flash", "gemini-2.5-pro", "gemini-1.5-flash"]
+        st.session_state.gemini_model = st.selectbox("Gemini Model", gemini_opts, index=gemini_opts.index(st.session_state.get("gemini_model", "gemini-2.5-flash")) if st.session_state.get("gemini_model") in gemini_opts else 0)
+        st.caption(f"Fallback: Groq ({st.session_state.get('groq_model', 'llama-3.3-70b-versatile')})")
+        
+    elif st.session_state.llm_provider == "groq":
+        groq_opts = ["llama-3.3-70b-versatile", "deepseek-r1-distill-llama-70b", "qwen-qwq-32b"]
+        st.session_state.groq_model = st.selectbox("Groq Model", groq_opts, index=groq_opts.index(st.session_state.get("groq_model", "llama-3.3-70b-versatile")) if st.session_state.get("groq_model") in groq_opts else 0)
+        st.caption(f"Fallback: Gemini ({st.session_state.get('gemini_model', 'gemini-2.5-flash')})")
+        
     else:
-        st.caption(f"⚠️ Run: `ollama pull {st.session_state.selected_model}`")
+        pulled_models = get_ollama_models()
+        common_models = ["llama3.2", "llama3.1", "gemma3:4b", "deepseek-r1", "mistral"]
+        all_models    = list(dict.fromkeys(pulled_models + common_models))
+        cur = st.session_state.selected_model
+        idx = all_models.index(cur) if cur in all_models else 0
+        st.session_state.selected_model = st.selectbox("Ollama Model", all_models, index=idx)
+        st.caption(f"Fallback: Gemini ({st.session_state.get('gemini_model', 'gemini-2.5-flash')})")
+
 
     st.divider()
 
@@ -96,12 +108,12 @@ with left:
     st.subheader("🗣️ Whisper Configuration")
 
     st.session_state.whisper_model_size = st.selectbox(
-        "Whisper Model",
-        ["tiny", "base", "small", "medium", "large", "large-v2", "large-v3"],
-        index=["tiny","base","small","medium","large","large-v2","large-v3"].index(
-            st.session_state.whisper_model_size
+        "Faster-Whisper Model",
+        ["tiny", "base", "small", "medium", "large-v3"],
+        index=["tiny", "base", "small", "medium", "large-v3"].index(
+            st.session_state.whisper_model_size if st.session_state.whisper_model_size in ["tiny", "base", "small", "medium", "large-v3"] else "medium"
         ),
-        help="Larger = more accurate, slower. large-v2 recommended.",
+        help="tiny/small = Speed Mode | medium/large-v3 = Accuracy Mode",
     )
 
     st.session_state.whisper_language = st.selectbox(

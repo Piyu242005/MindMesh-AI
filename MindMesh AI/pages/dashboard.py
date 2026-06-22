@@ -49,17 +49,19 @@ for jf in json_files:
     except Exception:
         pass
 
-# Count queries from session state
-total_queries = st.session_state.get("query_count", 0)
+# Count metrics from session state
+metrics = st.session_state.get("llm_metrics", {"total_requests": 0, "total_tokens": 0, "response_times": []})
+total_requests = metrics["total_requests"]
+avg_latency = sum(metrics["response_times"]) / len(metrics["response_times"]) if metrics["response_times"] else 0.0
 
 # ── Metric row ────────────────────────────────────────────────────────────────
 c1, c2, c3, c4, c5, c6 = st.columns(6)
 with c1: st.metric("📚 Courses",        len(json_files))
 with c2: st.metric("📄 Chunks",         f"{total_chunks:,}")
 with c3: st.metric("🗄️ Vectors",        f"{vec_count:,}")
-with c4: st.metric("💬 Queries",        total_queries)
+with c4: st.metric("💬 LLM Requests",   total_requests)
 with c5: st.metric("📦 Collection",     col_status)
-with c6: st.metric("🧠 Embed Dim",      "384")
+with c6: st.metric("⏱️ Avg Latency",   f"{avg_latency:.2f}s")
 
 st.divider()
 
@@ -79,7 +81,7 @@ with col_sys:
     }
 
     # Show only the core service checks (not folders/env) in the summary
-    service_keys = ["FFmpeg", "Ollama", "Whisper", "SentenceTransformers", "Qdrant"]
+    service_keys = ["FFmpeg", "Whisper", "SentenceTransformers", "Qdrant"]
 
     for key in service_keys:
         if key not in checks:
@@ -92,6 +94,38 @@ with col_sys:
   <span class="mm-badge {cls}">{dot} {label}</span>
 </div>
 <div style="padding:0 0 4px 2px;font-size:0.75rem;color:rgba(255,255,255,0.32)">{detail}</div>
+""", unsafe_allow_html=True)
+        
+    from backend.llm_manager import check_providers
+    llm_status = check_providers()
+    provider = st.session_state.get("llm_provider", "gemini")
+    
+    # Select the correct model based on provider
+    if provider == "gemini":
+        model_name = st.session_state.get("gemini_model", "gemini-2.5-flash")
+    elif provider == "groq":
+        model_name = st.session_state.get("groq_model", "llama-3.3-70b-versatile")
+    else:
+        model_name = st.session_state.get("selected_model", "llama3.2")
+        
+    st.markdown(f"""
+<div class="mm-card" style="margin-top: 15px">
+  <div class="mm-card-title">LLM Gateway</div>
+  <div style="margin-top:12px">
+    <div class="mm-check-row">
+      <span class="mm-check-label">Active Provider</span>
+      <span class="mm-badge mm-badge-ok">● {provider.capitalize()}</span>
+    </div>
+    <div class="mm-check-row">
+      <span class="mm-check-label">Active Model</span>
+      <span style="font-family:'JetBrains Mono',monospace;font-size:0.85rem;color:white">{model_name}</span>
+    </div>
+    <div class="mm-check-row">
+      <span class="mm-check-label">Estimated Tokens</span>
+      <span style="font-family:'JetBrains Mono',monospace;font-size:0.85rem;color:white">{metrics['total_tokens']:,}</span>
+    </div>
+  </div>
+</div>
 """, unsafe_allow_html=True)
 
 with col_qdrant:

@@ -22,29 +22,29 @@ import qdrant_helper as qh
 OLLAMA_BASE = os.getenv("OLLAMA_URL", "http://localhost:11434")
 
 
-# ── Ollama availability ───────────────────────────────────────────────────────
+# ── LLM availability (via LLM Manager) ────────────────────────────────────────
 
 def is_ollama_running() -> bool:
-    """Return True if Ollama server is reachable."""
-    import requests
-    try:
-        r = requests.get(f"{OLLAMA_BASE}/api/tags", timeout=2)
-        return r.status_code == 200
-    except Exception:
-        return False
+    """Check if any LLM provider is available."""
+    from backend.llm_manager import check_providers
+    status = check_providers()
+    # Return true if any provider is ready
+    return any(s[0] for s in status.values())
 
 
 def get_ollama_models() -> List[str]:
-    """Return list of pulled Ollama model names. Empty list if offline."""
+    """Legacy helper: returns available models for the local Ollama provider."""
+    from backend.llm_manager import check_providers
     import requests
-    try:
-        r = requests.get(f"{OLLAMA_BASE}/api/tags", timeout=3)
-        if r.status_code == 200:
-            return [m["name"] for m in r.json().get("models", [])]
-    except Exception:
-        pass
+    status = check_providers()
+    if status.get("ollama", (False,))[0]:
+        try:
+            r = requests.get(f"{OLLAMA_BASE}/api/tags", timeout=3)
+            if r.status_code == 200:
+                return [m["name"] for m in r.json().get("models", [])]
+        except Exception:
+            pass
     return []
-
 
 # ── Retrieval ─────────────────────────────────────────────────────────────────
 
@@ -155,56 +155,22 @@ User asked this question related to the video chunks, you have to answer in a hu
 '''
 
 
-# ── Ollama inference ──────────────────────────────────────────────────────────
+# ── LLM inference (via LLM Manager) ──────────────────────────────────────────
 
-def generate_sync(prompt: str, model_name: str) -> str:
-    """Send prompt to Ollama, wait for full response. Returns string."""
-    import requests
-    try:
-        r = requests.post(
-            f"{OLLAMA_BASE}/api/generate",
-            json={"model": model_name, "prompt": prompt, "stream": False},
-            timeout=180,
-        )
-        r.raise_for_status()
-        return r.json().get("response", "")
-    except requests.exceptions.ConnectionError:
-        return "⚠️ **Ollama is not running.** Start it with: `ollama serve`"
-    except requests.exceptions.Timeout:
-        return "⚠️ **Ollama timed out.** The model may be overloaded — try again."
-    except Exception as e:
-        return f"⚠️ **LLM error:** {e}"
+def generate_sync(prompt: str, model_name: str, provider: str = "gemini") -> str:
+    """Send prompt to LLM Manager, wait for full response. Returns string."""
+    from backend.llm_manager import generate_response
+    return generate_response(prompt, provider=provider, model_name=model_name, stream=False)
 
 
-def stream_response(prompt: str, model_name: str) -> Generator[str, None, None]:
+def stream_response(prompt: str, model_name: str, provider: str = "gemini") -> Generator[str, None, None]:
     """
-    Generator that yields string tokens from Ollama streaming API.
+    Generator that yields string tokens from the LLM Manager.
     Compatible with st.write_stream().
     """
-    import requests
+    from backend.llm_manager import generate_response
+    return generate_response(prompt, provider=provider, model_name=model_name, stream=True)
 
-    try:
-        with requests.post(
-            f"{OLLAMA_BASE}/api/generate",
-            json={"model": model_name, "prompt": prompt, "stream": True},
-            stream=True,
-            timeout=180,
-        ) as r:
-            for line in r.iter_lines():
-                if line:
-                    try:
-                        data  = json.loads(line)
-                        token = data.get("response", "")
-                        if token:
-                            yield token
-                        if data.get("done"):
-                            break
-                    except json.JSONDecodeError:
-                        continue
-    except requests.exceptions.ConnectionError:
-        yield "\n\n⚠️ **Ollama is not running.** Start it with: `ollama serve`"
-    except Exception as e:
-        yield f"\n\n⚠️ **Error:** {e}"
 
 
 # ── Formatting helpers ────────────────────────────────────────────────────────

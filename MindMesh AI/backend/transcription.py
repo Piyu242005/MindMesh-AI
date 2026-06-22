@@ -21,14 +21,21 @@ if str(_ROOT) not in sys.path:
 
 # ── Whisper model (cached — loaded once per Streamlit session) ────────────────
 
-@st.cache_resource(show_spinner="Loading Whisper model…")
-def get_whisper_model(model_size: str = "large-v2"):
-    """Load and cache a Whisper model. First call downloads if needed (~3GB for large-v2)."""
+@st.cache_resource(show_spinner="Loading Faster-Whisper model…")
+def get_whisper_model(model_size: str = "medium"):
+    """Load and cache a Faster-Whisper model with auto hardware detection."""
     try:
-        import whisper
-        return whisper.load_model(model_size)
+        from faster_whisper import WhisperModel
+        import torch
+        
+        # Hardware detection
+        device = "cuda" if torch.cuda.is_available() else "cpu"
+        compute_type = "float16" if device == "cuda" else "int8"
+        
+        print(f"[Faster-Whisper] Loading '{model_size}' on {device.upper()} with {compute_type}...")
+        return WhisperModel(model_size, device=device, compute_type=compute_type)
     except ImportError:
-        raise ImportError("openai-whisper is not installed. Run: pip install openai-whisper")
+        raise ImportError("faster-whisper is not installed. Run: pip install faster-whisper")
 
 
 # ── System checks ─────────────────────────────────────────────────────────────
@@ -43,9 +50,9 @@ def is_ffmpeg_available() -> bool:
 
 
 def is_whisper_available() -> bool:
-    """Return True if openai-whisper is installed."""
+    """Return True if faster-whisper is installed."""
     try:
-        import whisper  # noqa: F401
+        from faster_whisper import WhisperModel  # noqa: F401
         return True
     except ImportError:
         return False
@@ -97,21 +104,39 @@ def transcribe_audio(
     video_title: str,
     language: str = "hi",
     task: str = "translate",
+    on_progress: Optional[callable] = None,
 ) -> Dict[str, Any]:
     """
-    Transcribe an audio file using Whisper.
-
-    Returns the full Whisper result dict:
-        {"text": "...", "segments": [{start, end, text, ...}, ...]}
+    Transcribe an audio file using Faster-Whisper.
+    Returns the parsed dict: {"text": "...", "segments": [{start, end, text, ...}, ...]}
+    Yields to on_progress(text_so_far) if provided.
     """
-    result = whisper_model.transcribe(
-        audio=str(audio_path),
-        language=language,
+    # faster-whisper returns an iterator of segments
+    segments_gen, info = whisper_model.transcribe(
+        str(audio_path),
+        language=language if language != "auto" else None,
         task=task,
-        word_timestamps=False,
-        verbose=False,
+        vad_filter=True, # Recommended for faster-whisper to remove silence
     )
-    return result
+    
+    segments = []
+    full_text_chunks = []
+    
+    for seg in segments_gen:
+        segments.append({
+            "start": seg.start,
+            "end": seg.end,
+            "text": seg.text.strip()
+        })
+        full_text_chunks.append(seg.text.strip())
+        
+        if on_progress:
+            on_progress(seg.text.strip())
+            
+    return {
+        "text": " ".join(full_text_chunks),
+        "segments": segments
+    }
 
 
 def build_chunks(
@@ -119,7 +144,7 @@ def build_chunks(
     video_number: str,
     video_title: str,
 ) -> List[Dict[str, Any]]:
-    """Convert Whisper segment list into MindMesh chunk format."""
+    """Convert segment list into MindMesh chunk format."""
     chunks = []
     for seg in whisper_result.get("segments", []):
         chunks.append({
@@ -127,7 +152,7 @@ def build_chunks(
             "title":  video_title,
             "start":  seg["start"],
             "end":    seg["end"],
-            "text":   seg["text"].strip(),
+            "text":   seg["text"],
         })
     return chunks
 
@@ -187,10 +212,16 @@ def process_video(
         raise
 
     # Step 2: Transcribe
-    _step("Transcribe", "active", f"Whisper ({language} → {task})")
+    _step("Transcribe", "active", f"Faster-Whisper ({language} → {task})")
     try:
+        # Wrap on_step to show live progress
+        def _on_progress(latest_text: str):
+            # Show the latest transcribed text snippet
+            preview = latest_text[:40] + "..." if len(latest_text) > 40 else latest_text
+            _step("Transcribe", "active", f"🗣️ {preview}")
+            
         whisper_result = transcribe_audio(
-            audio_path, whisper_model, video_number, video_title, language, task
+            audio_path, whisper_model, video_number, video_title, language, task, on_progress=_on_progress
         )
         chunks    = build_chunks(whisper_result, video_number, video_title)
         full_text = whisper_result.get("text", "")

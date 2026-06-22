@@ -39,13 +39,23 @@ st.markdown(f"<style>{_css}</style>", unsafe_allow_html=True)
 # ── Session state defaults ────────────────────────────────────────────────────
 _defaults = {
     # Settings — LLM
+    "llm_provider":          os.getenv("LLM_PROVIDER", "gemini"),
+    "gemini_model":          os.getenv("GEMINI_MODEL", "gemini-2.5-flash"),
+    "groq_model":            os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile"),
     "selected_model":        os.getenv("OLLAMA_MODEL", "llama3.2"),
+    
+    # LLM Cost/Token Tracking
+    "llm_metrics":           {
+        "total_requests": 0,
+        "total_tokens": 0,
+        "response_times": []
+    },
     # Settings — Retrieval
     "top_k":                 5,
     "score_threshold":       0.0,
     # Settings — Embeddings
     "embed_batch_size":      64,
-    "whisper_model_size":    "large-v2",
+    "whisper_model_size":    "medium",
     "whisper_language":      "hi",
     "whisper_task":          "translate",
     # Chat
@@ -88,7 +98,7 @@ with st.sidebar:
         '<p class="mm-logo">Mind<span>Mesh</span> AI</p>',
         unsafe_allow_html=True,
     )
-    st.caption("RAG · Qdrant · Ollama · Whisper")
+    st.caption("RAG · Qdrant · Gemini · Groq · Whisper")
     st.divider()
 
 # ── Run selected page ─────────────────────────────────────────────────────────
