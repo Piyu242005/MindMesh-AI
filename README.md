@@ -35,6 +35,14 @@ By orchestrating intelligent routing between Google Gemini Flash and Groq's LLaM
 
 ---
 
+## 📸 Screenshots
+
+<div align="center">
+  <img src="MindMesh%20AI/assets/AI%20REPSONSE.png" alt="AI Response" width="800">
+</div>
+
+---
+
 ## ✨ Key Features
 
 | Feature | Description |
