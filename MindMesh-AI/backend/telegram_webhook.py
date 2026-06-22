@@ -4,10 +4,7 @@ from pathlib import Path
 from fastapi import FastAPI, Request
 from dotenv import load_dotenv
 
-# Ensure root path
-ROOT = Path(__file__).parent.parent
-if str(ROOT) not in sys.path:
-    sys.path.insert(0, str(ROOT))
+
 
 from backend.telegram_helper import send_notification
 from process_incoming import (

@@ -13,10 +13,7 @@ from typing import List, Dict, Any, Generator, Optional
 
 import functools
 
-# Ensure root on sys.path so qdrant_helper is importable
-_ROOT = Path(__file__).parent.parent
-if str(_ROOT) not in sys.path:
-    sys.path.insert(0, str(_ROOT))
+
 
 
 # ── Whisper model (cached — loaded once globally) ─────────────────────────────

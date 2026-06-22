@@ -10,10 +10,7 @@ import requests
 from pathlib import Path
 from typing import Dict, Tuple
 
-# Ensure root (MindMesh AI/) is on path so pages can import qdrant_helper
-_ROOT = Path(__file__).parent.parent
-if str(_ROOT) not in sys.path:
-    sys.path.insert(0, str(_ROOT))
+
 
 
 from backend.telegram_helper import send_admin_alert

@@ -71,6 +71,8 @@ from fastapi.responses import HTMLResponse
 from fastapi.exceptions import RequestValidationError
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
+templates = Jinja2Templates(directory=str(TEMPLATES_DIR))
+
 @app.exception_handler(StarletteHTTPException)
 async def http_exception_handler(request: Request, exc: StarletteHTTPException):
     if exc.status_code == 404:
@@ -99,7 +101,6 @@ def health():
     }
 
 # ── Routers ───────────────────────────────────────────────────────────────────
-templates = Jinja2Templates(directory=str(TEMPLATES_DIR))
 
 from routes import dashboard, upload, chat, settings
 app.include_router(dashboard.router)
@@ -107,9 +108,7 @@ app.include_router(upload.router)
 app.include_router(chat.router)
 app.include_router(settings.router)
 
-@app.get("/health")
-async def health_check():
-    return {"status": "ok"}
+
 
 @app.post("/api/telegram/webhook")
 async def telegram_webhook(request: Request):

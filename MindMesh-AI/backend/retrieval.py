@@ -12,10 +12,7 @@ import time
 from pathlib import Path
 from typing import List, Dict, Any, Generator, Optional, Tuple
 
-# Ensure root on sys.path
-_ROOT = Path(__file__).parent.parent
-if str(_ROOT) not in sys.path:
-    sys.path.insert(0, str(_ROOT))
+
 
 from backend import qdrant_helper as qh
 
