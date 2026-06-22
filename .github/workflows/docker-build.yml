@@ -1,0 +1,23 @@
+name: Docker Build Check
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  docker-build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Build Docker Image
+        run: docker build -t mindmesh-app:latest .
+
+      - name: Verify Success
+        run: docker image inspect mindmesh-app:latest > /dev/null
