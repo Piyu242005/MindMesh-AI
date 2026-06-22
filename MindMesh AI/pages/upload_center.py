@@ -172,7 +172,7 @@ if submit and uploaded_files:
         st.stop()
 
     if not tx.is_whisper_available():
-        st.error("Whisper is not installed. Run: `pip install openai-whisper`")
+        st.error("Faster-Whisper is not installed. Run: `pip install faster-whisper`")
         st.stop()
 
     st.divider()

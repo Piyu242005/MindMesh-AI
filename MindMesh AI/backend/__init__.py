@@ -56,11 +56,11 @@ def verify_system() -> Dict[str, Tuple[str, str, str]]:
 
     # ── Whisper ─────────────────────────────────────────────────────────────
     try:
-        import whisper          # noqa: F401
-        results["Whisper"] = ("ok", "Available", "openai-whisper installed")
+        from faster_whisper import WhisperModel  # noqa: F401
+        results["Whisper"] = ("ok", "Available", "faster-whisper installed")
     except ImportError:
-        results["Whisper"] = ("error", "Missing",
-                              "pip install openai-whisper")
+        results["Whisper"] = ("err", "Missing", 
+                              "pip install faster-whisper")
 
     # ── SentenceTransformers ────────────────────────────────────────────────
     try:
