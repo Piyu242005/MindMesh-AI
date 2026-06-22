@@ -137,13 +137,27 @@ with col_qdrant:
     st.subheader("🌐 Qdrant Cloud")
 
     if qdrant_ok:
+        status_lower = col_status.lower()
+        if "error" in status_lower or "not found" in status_lower:
+            badge_cls = "mm-badge-err"
+            display_status = "Not Created"
+        elif "yellow" in status_lower:
+            badge_cls = "mm-badge-warn"
+            display_status = "Degraded"
+        elif "green" in status_lower or "ok" in status_lower:
+            badge_cls = "mm-badge-ok"
+            display_status = "Ready"
+        else:
+            badge_cls = "mm-badge-warn"
+            display_status = col_status
+
         st.markdown(f"""
 <div class="mm-card">
   <div class="mm-card-title">Collection: <code>{qh.QDRANT_COLLECTION}</code></div>
   <div style="margin-top:12px">
     <div class="mm-check-row">
       <span class="mm-check-label">Status</span>
-      <span class="mm-badge mm-badge-ok">● {col_status}</span>
+      <span class="mm-badge {badge_cls}">● {display_status}</span>
     </div>
     <div class="mm-check-row">
       <span class="mm-check-label">Vector Count</span>
