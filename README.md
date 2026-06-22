@@ -1,736 +1,195 @@
 <div align="center">
 
-<img src="https://readme-typing-svg.demolab.com?font=Outfit&weight=900&size=50&duration=3000&pause=1000&color=7F00FF&background=00000000&center=true&vCenter=true&width=1000&lines=🌌+MINDMESH+AI+(AURORA+RAG);✨+Next-Gen+AI+Video+Knowledge+Base;🚀+Powered+by+FastAPI+%2B+Ollama" alt="Typing SVG" />
+<img src="https://readme-typing-svg.demolab.com?font=Inter&weight=600&size=40&pause=1000&color=7F00FF&center=true&vCenter=true&width=800&lines=MINDMESH+AI;Enterprise+Video+RAG;Autonomous+Knowledge+Base" alt="Typing SVG" />
 
-<h3>
-  <img src="https://img.shields.io/badge/✨-Premium_Aurora_Theme-7F00FF?style=for-the-badge" alt="Aurora Theme" />
-  <img src="https://img.shields.io/badge/🚀-Production_Ready-00D9FF?style=for-the-badge" alt="Production Ready" />
-  <img src="https://img.shields.io/badge/⚡-Lightning_Fast-FFD700?style=for-the-badge" alt="Lightning Fast" />
-</h3>
+# MindMesh AI
 
-[![Python](https://img.shields.io/badge/Python-3.10+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://python.org)
-[![FastAPI](https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
-[![Ollama](https://img.shields.io/badge/AI-Ollama-000000?style=for-the-badge&logo=ollama&logoColor=white)](https://ollama.ai)
-[![ChromaDB](https://img.shields.io/badge/Vector_DB-ChromaDB-FF6600?style=for-the-badge)](https://trychroma.com)
-[![License](https://img.shields.io/badge/License-MIT-purple?style=for-the-badge)](LICENSE)
+**Enterprise Video RAG & Autonomous Knowledge Base Platform**
 
-<br/>
+[![Typing SVG](https://readme-typing-svg.demolab.com?font=Inter&weight=600&size=20&pause=1000&color=8B5CF6&center=true&vCenter=true&width=800&lines=Transcribe+Videos+with+Faster-Whisper;Smart+Routing+Between+Top+LLMs;Production-Grade+AI+Architecture;Fast%2C+Accurate%2C+and+Cost-Effective)](https://git.io/typing-svg)
 
-### 💎 **Experience the Future of Learning**
-
-*Transform your video library into an interactive, intelligent knowledge base with our stunning Glassmorphism Aurora interface.*
-
-<br/>
-
-**[🚀 Quick Start](#-quick-start-guide) • [✨ Features](#-core-features) • [⚙️ Architecture](#️-system-architecture) • [📂 Structure](#-project-structure) • [🤝 Contributing](#-contributing)**
-
-<br/>
+[![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://python.org)
+[![Streamlit](https://img.shields.io/badge/Streamlit-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white)](https://streamlit.io)
+[![Qdrant](https://img.shields.io/badge/Qdrant-000000?style=for-the-badge&logo=qdrant&logoColor=white)](https://qdrant.tech/)
+[![Gemini](https://img.shields.io/badge/Google%20Gemini-4285F4?style=for-the-badge&logo=google&logoColor=white)](https://ai.google.dev/)
+[![Groq](https://img.shields.io/badge/Groq-F55036?style=for-the-badge&logo=groq&logoColor=white)](https://groq.com)
+[![Hugging Face](https://img.shields.io/badge/Hugging_Face-FFD21E?style=for-the-badge&logo=huggingface&logoColor=black)](https://huggingface.co/)
+<br>
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](https://opensource.org/licenses/MIT)
+[![Stars](https://img.shields.io/github/stars/Piyu242005/MindMesh-AI?style=flat-square)](https://github.com/Piyu242005/MindMesh-AI/stargazers)
+[![Forks](https://img.shields.io/github/forks/Piyu242005/MindMesh-AI?style=flat-square)](https://github.com/Piyu242005/MindMesh-AI/network/members)
 
 </div>
+
+<br/>
+
+## 📝 Overview
+
+**MindMesh AI** is a production-grade enterprise application that transforms raw educational videos and courses into a deeply searchable, interactive AI knowledge base. It leverages Faster-Whisper for high-speed offline transcription, SentenceTransformers for chunk embedding, and Qdrant Cloud for blazing-fast vector retrieval. 
+
+By orchestrating intelligent routing between Google Gemini Flash and Groq's LLaMA 3.3, MindMesh AI delivers scalable, context-aware answers directly linked to exact video timestamps.
 
 ---
 
-<div align="center">
+## ✨ Key Features
 
-## 🎨 **Live Interface Preview**
-
-### 🌟 Main Dashboard - Aurora Welcome Screen
-
-<div align="center">
-<img src="https://via.placeholder.com/800x400.png?text=Aurora+Dashboard+-+Main+Interface" alt="Aurora Dashboard - Main Interface" width="90%" style="border-radius: 15px; box-shadow: 0 10px 40px rgba(127,0,255,0.3); margin: 20px 0;" />
-</div>
-
-*Beautiful gradient-based UI with glassmorphism effects and pre-built example prompts*
-
-<br/>
-
-### 💬 Interactive Chat Interface
-
-<div align="center">
-<img src="https://via.placeholder.com/800x400.png?text=Aurora+Chat+Interface" alt="Aurora Chat Interface" width="90%" style="border-radius: 15px; box-shadow: 0 10px 40px rgba(0,217,255,0.3); margin: 20px 0;" />
-</div>
-
-*Real-time streaming responses with context-aware answers and video timestamps*
-
-</div>
+| Feature | Description |
+| :--- | :--- |
+| ⚡ **Faster-Whisper Transcription** | Transcribes video courses at incredible speeds with GPU acceleration via CTranslate2. |
+| 🔀 **Multi-LLM Gateway** | Unified interface combining models from Google Gemini and Groq with seamless failover. |
+| 🛡️ **Automatic Fallback System** | Seamlessly reroutes failed API requests (e.g., 429 Quota limits) to backup providers. |
+| 🌐 **Qdrant Cloud Integration** | High-performance semantic vector search completely removing local memory bottlenecks. |
+| ⏱️ **Timestamp Deep Linking** | AI answers include precise timestamps tracing back to the exact moment in the source video. |
+| 📊 **Advanced Analytics Dashboard** | Real-time telemetry tracking total requests, token counts, and LLM latency. |
+| 🎨 **Premium UI/UX** | Dark-mode Streamlit interface with responsive sidebars, custom styling, and live transcription progress. |
 
 ---
 
-<div align="center">
-
-## 🌟 **What is MindMesh AI (Aurora RAG)?**
-
-<br/>
-
-<img src="https://img.shields.io/badge/🎯-Intelligent_Video_Course_Assistant-7F00FF?style=for-the-badge" />
-
-</div>
-
-<br/>
-
-<table>
-<tr>
-<td width="100%" align="center">
-
-### **MindMesh AI** transforms your video course library into an **intelligent, AI-powered knowledge base**
-
-*Production-ready conversational assistant with stunning Glassmorphism UI*
-
-</td>
-</tr>
-</table>
-
-<br/>
-
-<table>
-<tr>
-<td width="33%" align="center">
-
-### 🏗️ **Built With**
-
-**FastAPI** Backend
-<br/>⚡ High-performance async
-
-**Vanilla JS/CSS** Frontend
-<br/>🎨 Zero dependencies
-
-**Ollama** AI Models
-<br/>🤖 Local & private
-
-</td>
-<td width="34%" align="center">
-
-### 🎯 **Core Technology**
-
-**Hybrid RAG Pipeline**
-<br/>🔍 BM25 + Embeddings
-
-**Cross-Encoder Reranking**
-<br/>🎯 Precision results
-
-**Streaming Responses**
-<br/>⚡ Real-time feedback
-
-</td>
-<td width="33%" align="center">
-
-### 💎 **Design Philosophy**
-
-**Glassmorphism UI**
-<br/>✨ Premium aesthetics
-
-**Aurora Theme**
-<br/>🌌 Purple-cyan gradients
-
-**Mobile-First**
-<br/>📱 Fully responsive
-
-</td>
-</tr>
-</table>
-
-<br/>
-
----
-
-<div align="center">
-
-### 🎭 **Why Choose MindMesh AI?**
-
-<br/>
-
-<blockquote align="left">
-<h4>💡 "It's not just about finding answers; it's about the experience."</h4>
-</blockquote>
-
-</div>
-
-<br/>
-
-<table>
-<tr>
-<td width="50%" valign="top">
-
-### 🧠 **Context-Aware Intelligence**
-
-Remembers your entire conversation history for coherent, multi-turn dialogues. Ask follow-up questions naturally without repeating context.
-
-> ✅ **Multi-turn conversations**<br/>
-> ✅ **Context retention**<br/>
-> ✅ **Smart reference resolution**<br/>
-> ✅ **Conversation branching**
-
----
-
-### ⚡ **Real-Time Streaming**
-
-ChatGPT-style token-by-token streaming for instant feedback. See responses as they're generated, not after completion.
-
-> ⚡ **Token streaming**<br/>
-> ⚡ **Progress indicators**<br/>
-> ⚡ **Stop generation control**<br/>
-> ⚡ **Sub-second first token**
-
----
-
-### 🎯 **Precision Retrieval**
-
-Hybrid search combining BM25 keyword matching with semantic embeddings, followed by cross-encoder reranking for maximum accuracy.
-
-> 🔍 **Hybrid search (BM25 + Vector)**<br/>
-> 🎯 **Cross-encoder reranking**<br/>
-> 📊 **Relevance scoring**<br/>
-> 📑 **Source attribution**
-
-</td>
-<td width="50%" valign="top">
-
-<br/>
-
-<div align="center">
-
-### 📊 **How Aurora Works**
+## 🏗️ Architecture
 
 ```mermaid
 graph TD
-    Q[🎓 User Question] -->|Hybrid Search| S[🔍 Retrieval]
-    S -->|BM25 + Vector| R[🎯 Reranking]
-    R -->|Cross-Encoder| C[📚 Context]
-    C -->|Prompt| L[🤖 LLM Generation]
-    L -->|Stream| A[💬 Final Answer]
+    %% Styling
+    classDef user fill:#6366f1,stroke:#4f46e5,stroke-width:2px,color:#fff,rx:8px,ry:8px;
+    classDef media fill:#8b5cf6,stroke:#7c3aed,stroke-width:2px,color:#fff,rx:8px,ry:8px;
+    classDef embed fill:#10b981,stroke:#059669,stroke-width:2px,color:#fff,rx:8px,ry:8px;
+    classDef vector fill:#f59e0b,stroke:#d97706,stroke-width:2px,color:#fff,rx:8px,ry:8px;
+    classDef llm fill:#3b82f6,stroke:#2563eb,stroke-width:2px,color:#fff,rx:8px,ry:8px;
     
-    style Q fill:#7F00FF,color:#fff
-    style A fill:#00D9FF,color:#fff
-```
-
-</div>
-
-<br/>
-
----
-
-### 🎬 **Smart Deep Linking**
-
-Jump directly to exact timestamps in source videos. Every answer includes clickable timestamps that take you to the relevant moment.
-
-> ⏱️ **Precise timestamp extraction**<br/>
-> 🔗 **Clickable video links**<br/>
-> 📽️ **Multiple source references**<br/>
-> 💯 **Confidence scoring**
-
----
-
-### 🎨 **Premium UI/UX**
-
-Beautiful Aurora theme with purple-cyan gradients, glassmorphism effects, smooth animations, and dark mode optimization.
-
-> ✨ **Glassmorphism design**<br/>
-> 🌊 **Smooth transitions**<br/>
-> ⌨️ **Typing animations**<br/>
-> 📋 **Copy to clipboard**
-
-</td>
-</tr>
-</table>
-
-<br/>
-
-<div align="center">
-
-### ⚡ **Performance Highlights**
-
-<table>
-<tr>
-<td align="center" width="25%">
-<h3>~200ms</h3>
-<sub>Hybrid Search</sub>
-</td>
-<td align="center" width="25%">
-<h3>~150ms</h3>
-<sub>Reranking</sub>
-</td>
-<td align="center" width="25%">
-<h3>~500ms</h3>
-<sub>First Token</sub>
-</td>
-<td align="center" width="25%">
-<h3>100%</h3>
-<sub>Local & Private</sub>
-</td>
-</tr>
-</table>
-
-</div>
-
----
-
-<div align="center">
-
-## ✨ **Core Features**
-
-<br/>
-
-*Everything you need for a premium RAG experience, out of the box*
-
-</div>
-
-<br/>
-
-### 🤖 **Intelligent Backend Architecture**
-
-<table>
-<tr>
-<td width="25%" valign="top">
-
-#### 🏗️ **FastAPI Core**
-
-**High-Performance Server**
-
-• `async/await` for high concurrency
-• Type-safe with Pydantic models
-• Auto-generated OpenAPI docs
-• CORS-enabled REST API
-• Health check endpoints
-
-<br/>
-
-<div align="center">
-<img src="https://img.shields.io/badge/FastAPI-009688?style=flat-square&logo=fastapi&logoColor=white" />
-</div>
-
-</td>
-<td width="25%" valign="top">
-
-#### 🧠 **RAG Pipeline**
-
-**Advanced Retrieval System**
-
-• Multi-stage retrieval pipeline
-• Context-aware generation
-• Smart chunk selection
-• Prompt engineering
-• Source attribution
-
-<br/>
-
-<div align="center">
-<img src="https://img.shields.io/badge/RAG-Pipeline-7F00FF?style=flat-square" />
-</div>
-
-</td>
-<td width="25%" valign="top">
-
-#### 📡 **Streaming**
-
-**Real-Time Responses**
-
-• Token-by-token streaming
-• Newline-delimited JSON
-• Graceful error handling
-• Stop generation control
-• Progress feedback
-
-<br/>
-
-<div align="center">
-<img src="https://img.shields.io/badge/Streaming-Enabled-00D9FF?style=flat-square" />
-</div>
-
-</td>
-<td width="25%" valign="top">
-
-#### 💾 **Sessions**
-
-**Persistent History**
-
-• SQLite-based storage
-• Multi-session support
-• Conversation history
-• Context retention
-• Export capabilities
-
-<br/>
-
-<div align="center">
-<img src="https://img.shields.io/badge/SQLite-Database-003B57?style=flat-square&logo=sqlite" />
-</div>
-
-</td>
-</tr>
-</table>
-
-<br/>
-
-### 🛠️ **Technology Stack**
-
-<div align="center">
-
-<table>
-<tr>
-<td align="center" width="20%">
-<img src="https://skillicons.dev/icons?i=html,css,js" /><br/>
-<sub><b>Frontend</b></sub>
-</td>
-<td align="center" width="20%">
-<img src="https://skillicons.dev/icons?i=python,fastapi" /><br/>
-<sub><b>Backend</b></sub>
-</td>
-<td align="center" width="20%">
-<img src="https://img.shields.io/badge/Ollama-000000?style=for-the-badge&logo=ollama&logoColor=white" /><br/>
-<sub><b>LLM Engine</b></sub>
-</td>
-<td align="center" width="20%">
-<img src="https://img.shields.io/badge/ChromaDB-FF6600?style=for-the-badge" /><br/>
-<sub><b>Vector DB</b></sub>
-</td>
-<td align="center" width="20%">
-<img src="https://skillicons.dev/icons?i=sqlite" /><br/>
-<sub><b>Database</b></sub>
-</td>
-</tr>
-</table>
-
-**Models:** `llama3.2:latest` • `bge-m3:latest` • `nomic-embed-text` • `gemma3:4b`
-
-</div>
-
----
-
-<div align="center">
-
-## ⚙️ **System Architecture**
-
-</div>
-
-The MindMesh AI architecture is built for **speed, accuracy, and scalability**. It separates concerns cleanly between the client interface, API gateway, and AI processing engine.
-
-```mermaid
-graph TB
-    User[👤 User] -->|HTTPS| Frontend[🎨 Aurora Frontend UI]
-    Frontend -->|REST API| Backend[⚡ FastAPI Backend Server]
+    U(("👤 User Upload")):::user -->|"Uploads Video"| UI["🖥️ Streamlit Frontend"]:::user
+    UI -->|"FFmpeg Audio Extraction"| EXT["🎵 MP3 Extractor"]:::media
+    EXT -->|"Faster-Whisper (CTranslate2)"| TX["🗣️ Transcription Engine"]:::media
     
-    Backend --> Pipeline[🧠 RAG Pipeline Orchestrator]
+    TX -->|"Chunking JSON"| C["📄 Data Chunker"]:::media
+    C -->|"SentenceTransformers (BGE-Small)"| EMB["💡 Embedding Generation"]:::embed
     
-    Pipeline --> Search[🔍 Hybrid Search Engine]
-    Search --> Vector[📊 Semantic Search<br/>ChromaDB + Embeddings]
-    Search --> Keyword[📝 Keyword Search<br/>BM25 Index]
+    EMB -->|"Upsert Vectors"| Q["☁️ Qdrant Cloud Cluster"]:::vector
     
-    Pipeline --> Rerank[🎯 Cross-Encoder Reranking<br/>Score & Sort Results]
+    UI -->|"User Chat Query"| QRY["❓ User Query"]:::user
+    QRY -->|"Semantic Search"| Q
     
-    Pipeline --> Context[📚 Context Builder<br/>Prompt Engineering]
+    Q -->|"Retrieved Context"| LLMG["⚡ LLM Manager Gateway"]:::llm
     
-    Context --> LLM[🦙 Ollama LLM<br/>llama3.2:latest]
-    
-    LLM -->|Streaming Tokens| Backend
-    Backend -->|JSON Stream| Frontend
-    
-    Backend --> DB[(💾 SQLite Database<br/>Chat History)]
-    
-    style Frontend fill:#7F00FF,color:#fff
-    style Backend fill:#00D9FF,color:#fff
-    style Pipeline fill:#FFD700,color:#000
-    style LLM fill:#00FF88,color:#000
-```
-
-<br/>
-
-<div align="center">
-
-### 🔄 **How It Works**
-
-</div>
-
-The RAG (Retrieval-Augmented Generation) pipeline executes in 6 distinct steps:
-
-<table>
-<tr>
-<td align="center" width="16.66%">
-
-**1️⃣ User Query**
-<br/>🎤
-<br/>
-<sub>The user submits a question via the chat interface.</sub>
-
-</td>
-<td align="center" width="16.66%">
-
-**2️⃣ Search**
-<br/>🔍
-<br/>
-<sub>The backend performs a Hybrid Search using BM25 & Vector similarity.</sub>
-
-</td>
-<td align="center" width="16.66%">
-
-**3️⃣ Rerank**
-<br/>🎯
-<br/>
-<sub>A cross-encoder scores and reranks the top candidates.</sub>
-
-</td>
-<td align="center" width="16.66%">
-
-**4️⃣ Context**
-<br/>📚
-<br/>
-<sub>The most relevant video chunks are injected into the RAG prompt.</sub>
-
-</td>
-<td align="center" width="16.66%">
-
-**5️⃣ Generate**
-<br/>🤖
-<br/>
-<sub>The Ollama LLM generates an answer based on the injected context.</sub>
-
-</td>
-<td align="center" width="16.66%">
-
-**6️⃣ Stream**
-<br/>💬
-<br/>
-<sub>The response is streamed token-by-token back to the user.</sub>
-
-</td>
-</tr>
-</table>
-
----
-
-<div align="center">
-
-## 📂 **Project Structure**
-
-</div>
-
-The repository is organized to separate the data ingestion pipeline, the active application logic, and the persistent data stores.
-
-```plaintext
-RAG-Based-AI/
-│
-├── 📁 project/
-│   │
-│   ├── 📁 backend/                    # ⚡ FastAPI Backend Application
-│   │   ├── main.py                    # 🚀 API entry point & endpoints
-│   │   ├── rag_pipeline.py            # 🧠 Core RAG orchestration logic
-│   │   ├── search.py                  # 🔍 Hybrid search engine
-│   │   ├── models.py                  # 📋 Pydantic request/response models
-│   │   ├── config.py                  # ⚙️  Configuration management
-│   │   ├── prompts.py                 # 💬 Prompt templates
-│   │   ├── utils.py                   # 🛠️  Helper utilities
-│   │   ├── database.py                # 💾 SQLite operations
-│   │   ├── requirements.txt           # 📦 Python dependencies
-│   │   ├── embeddings.joblib          # 📊 Pre-computed embeddings (7MB)
-│   │   ├── bm25_index.joblib          # 📝 BM25 search index (8MB)
-│   │   └── chat_history.db            # 💬 Chat session database
-│   │
-│   └── 📁 frontend/                   # 🎨 Aurora UI (Vanilla JS)
-│       ├── index.html                 # 🌐 Single Page Application
-│       ├── style.css                  # 💎 Glassmorphism styling
-│       ├── script.js                  # ⚡ Chat logic & API calls
-│       └── 📁 assets/                 # 🖼️  Images & resources
-│
-├── 📁 legacy/                         # 📦 Legacy/Archived Scripts
-│   ├── app.py                         # Old Streamlit prototype
-│   ├── video_to_mp3.py                # Video ingestion pipeline
-│   ├── preprocess_json.py             # Data preprocessing
-│   └── ...
-│
-├── 📁 jsons/                          # 📄 Transcription JSON files
-│   ├── 01_Installing VS Code.json
-│   ├── 02_Your First HTML.json
-│   └── ... (18 course transcripts)
-│
-├── README.md                          # 📖 This file
-├── .env                               # 🔐 Environment variables
-├── start_aurora.bat                   # 🪟 Windows startup script
-└── start_aurora.sh                    # 🐧 Linux/Mac startup script
+    LLMG -.->|"Primary"| GEM["🔵 Gemini 2.5 Flash"]:::llm
+    LLMG -.->|"Fallback"| GRQ["🟠 Groq LLaMA 3.3"]:::llm
 ```
 
 ---
 
+## 💻 Tech Stack
+
 <div align="center">
 
-## 🚀 **Quick Start Guide**
-
-Get MindMesh AI running in **under 5 minutes!**
+| Layer | Technologies |
+| :--- | :--- |
+| **Frontend** | ![Streamlit](https://img.shields.io/badge/Streamlit-FF4B4B?style=flat-square&logo=streamlit&logoColor=white) HTML5, CSS3 |
+| **Backend** | ![Python](https://img.shields.io/badge/Python_3.11-3776AB?style=flat-square&logo=python&logoColor=white) |
+| **AI Models** | ![Gemini](https://img.shields.io/badge/Gemini_2.5_Flash-4285F4?style=flat-square&logo=google&logoColor=white) ![Groq](https://img.shields.io/badge/Groq_LLaMA_3.3-F55036?style=flat-square&logo=groq&logoColor=white) |
+| **Data & Vectors** | ![Qdrant](https://img.shields.io/badge/Qdrant_Cloud-000000?style=flat-square&logo=qdrant&logoColor=white) ![SentenceTransformers](https://img.shields.io/badge/Sentence_Transformers-FFD21E?style=flat-square) |
+| **Audio Processing**| `Faster-Whisper`, `FFmpeg` |
 
 </div>
 
-<br/>
+---
 
-### 📋 **Prerequisites**
+## 📂 Project Structure
 
 ```bash
-✅ Python 3.10 or higher
-✅ Ollama installed with models: llama3.2, bge-m3
-✅ Modern web browser (Chrome, Firefox, Edge)
+MindMesh-AI/
+├── backend/                 # ⚡ Core backend services
+│   ├── embeddings.py        # SentenceTransformers encoding
+│   ├── llm_manager.py       # Gemini/Groq Fallback Router
+│   ├── retrieval.py         # Search & QA pipeline
+│   └── transcription.py     # Faster-Whisper pipeline
+├── pages/                   # 🖥️ Streamlit Views
+│   ├── ai_chat.py           # Conversational Interface
+│   ├── dashboard.py         # Analytics Dashboard
+│   ├── settings.py          # LLM & Whisper Config
+│   └── upload_center.py     # Video processing hub
+├── app.py                   # Main Streamlit Entrypoint
+├── qdrant_helper.py         # Qdrant Database driver
+├── benchmark_transcription.py # Faster-Whisper benchmarking
+├── validate_llm.py          # API Gateway Validation
+├── requirements.txt         # Dependencies
+└── .env.example             # Environment Variable Template
 ```
 
-<br/>
+---
 
-### ⚡ **Installation Steps**
+## ⚙️ Installation & Usage
 
-<table>
-<tr>
-<td width="10%" align="center">
-
-### 1️⃣
-
-</td>
-<td width="90%">
-
-**Clone the Repository**
-
+### 1. Clone the Repository
 ```bash
 git clone https://github.com/Piyu242005/MindMesh-AI.git
-cd RAG-Based-AI
+cd MindMesh-AI
 ```
 
-</td>
-</tr>
-<tr>
-<td align="center">
-
-### 2️⃣
-
-</td>
-<td>
-
-**Install Dependencies**
-
+### 2. Set up a Virtual Environment
 ```bash
-cd project/backend
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+```
+
+### 3. Install System Dependencies
+Install [FFmpeg](https://ffmpeg.org/download.html) and ensure it is added to your system `PATH`.
+
+### 4. Install Python Dependencies
+```bash
 pip install -r requirements.txt
 ```
 
-</td>
-</tr>
-<tr>
-<td align="center">
+### 5. Configure Environment Variables
+Create a `.env` file in the root directory and add your API keys:
+```env
+# Google Gemini API
+GEMINI_API_KEY=your_gemini_key
 
-### 3️⃣
+# Groq API
+GROQ_API_KEY=your_groq_key
 
-</td>
-<td>
+# Qdrant Cloud
+QDRANT_URL=your_qdrant_cluster_url
+QDRANT_API_KEY=your_qdrant_api_key
 
-**Start the Backend Server**
-
-```bash
-# From project/backend directory
-uvicorn main:app --port 8000 --host 0.0.0.0
+# Default Providers
+LLM_PROVIDER=gemini
+GEMINI_MODEL=gemini-2.5-flash
+GROQ_MODEL=llama-3.3-70b-versatile
 ```
 
-✨ **API Documentation:** `http://localhost:8000/docs`
-
-</td>
-</tr>
-<tr>
-<td align="center">
-
-### 4️⃣
-
-</td>
-<td>
-
-**Launch the Frontend**
-
-Simply open `project/frontend/index.html` in your browser!
-
+### 6. Run the Application
 ```bash
-# Or serve it locally
-cd project/frontend
-python -m http.server 3000
+streamlit run app.py
 ```
 
-🌐 **Open:** `http://localhost:3000`
+---
 
-</td>
-</tr>
-</table>
+## 🚀 How It Works
+
+1. **Upload Video**: User uploads an `.mp4` or `.mkv` file via the Streamlit Upload Center.
+2. **Audio Extraction & Transcription**: FFmpeg extracts the audio, and **Faster-Whisper** streams the transcription in real-time, yielding word-level segments and timestamps.
+3. **Chunking & Vectorization**: Transcriptions are chunked into logical JSON blocks and vectorized using `sentence-transformers (bge-small-en-v1.5)`.
+4. **Cloud Storage**: The vectors and metadata (timestamps, title) are upserted into **Qdrant Cloud**.
+5. **Ask Question**: User submits a query via the AI Chat page.
+6. **Smart Routing**: The `LLM Manager` directs the query along with Qdrant's semantic context to the primary cloud provider (Gemini). If rate limits are hit, it instantly fails-over to Groq.
+7. **Delivery**: The user receives a contextual answer complete with exact source video timestamps.
 
 ---
 
-<div align="center">
-
-## 🤝 **Contributing**
-
-We welcome contributions from Open Source Developers, Data Scientists, and AI Enthusiasts! 
-
-</div>
-
-### How to Contribute
-
-1. **Fork the repository** to your own GitHub account.
-2. **Create your feature branch:**
-   ```bash
-   git checkout -b feature/AmazingFeature
-   ```
-3. **Commit your changes:**
-   ```bash
-   git commit -m 'Add some AmazingFeature'
-   ```
-4. **Push to the branch:**
-   ```bash
-   git push origin feature/AmazingFeature
-   ```
-5. **Open a Pull Request** against the main repository.
-
-<br/>
-
-<div align="center">
-
-**Read [CONTRIBUTING.md](Contributing.md) for detailed guidelines**
-
-**Follow our [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)**
-
-</div>
-
----
-
-<div align="center">
-
-## 📄 **License**
-
-This project is licensed under the **MIT License** - see the LICENSE file for details.
-
-<br/>
-
-## 🙏 **Acknowledgments**
-
-Built with amazing open-source tools:
-
-**[FastAPI](https://fastapi.tiangolo.com/)** • **[Ollama](https://ollama.ai/)** • **[ChromaDB](https://trychroma.com/)** • **[Sentence-Transformers](https://www.sbert.net/)** • **[BM25](https://github.com/dorianbrown/rank_bm25)**
-
-</div>
-
----
-
-<div align="center">
-
-<br/>
-
-## 💜 **Built with passion by**
+## 👨‍💻 Author
 
 ### **Piyush Ramteke**
+**Data Scientist | AI Engineer | Python Developer**
 
-<br/>
+*Passionate about building scalable AI systems, Generative AI applications, and elegant data solutions.*
 
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/piyu24)
-[![GitHub](https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Piyu242005)
-
-<br/>
-
-<img src="https://img.shields.io/badge/Made_with-❤️_and_☕-purple?style=for-the-badge" />
-
-<br/>
+[![GitHub](https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Piyu242005)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white)](https://linkedin.com/in/piyush-ramteke)
+[![Hugging Face](https://img.shields.io/badge/Hugging_Face-FFD21E?style=for-the-badge&logo=huggingface&logoColor=black)](https://huggingface.co/Piyu242005)
+[![Portfolio](https://img.shields.io/badge/Portfolio-8B5CF6?style=for-the-badge&logo=vercel&logoColor=white)](https://piyushramteke.dev)
 
 ---
 
-### ⭐ **If you found this helpful, please consider giving it a star!**
-
-<br/>
-
-<sub>© 2026 MindMesh AI (Aurora RAG). All rights reserved.</sub>
-
+<div align="center">
+  <sub>Built with ❤️ using Python, Streamlit, and modern Generative AI.</sub>
 </div>
