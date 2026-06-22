@@ -66,3 +66,38 @@ This Code of Conduct is adapted from the [Contributor Covenant][homepage], versi
 
 [homepage]: https://www.contributor-covenant.org
 [v2.1]: https://www.contributor-covenant.org/version/2/1/code_of_conduct.html
+
+---
+
+## MindMesh AI Tech Stack & Architecture Context
+
+When contributing to this project, it is helpful to understand the flow of data and the core technologies we rely on to maintain high performance and accuracy:
+
+```text
+Video Upload
+      ↓
+FFmpeg
+      ↓
+Faster-Whisper
+      ↓
+JSON Chunks
+      ↓
+SentenceTransformer
+      ↓
+Qdrant Cloud
+      ↓
+Semantic Search
+      ↓
+Gemini / Groq
+      ↓
+Streamlit
+```
+
+### Explanation of the Tech Stack
+
+1. **Video Upload & FFmpeg**: The user uploads video courses. To save massive amounts of compute and memory, FFmpeg is used to instantly strip away the video stream, extracting only the raw audio (`.wav`) for processing.
+2. **Faster-Whisper**: This highly optimized, local transcription model converts the audio into text. It provides timestamps which we use to chop the transcript into logical overlapping **JSON Chunks**.
+3. **SentenceTransformer (`BAAI/bge-small-en-v1.5`)**: These text chunks are passed into a local embedding model that converts the semantic meaning of the text into high-dimensional numerical vectors (384 dimensions).
+4. **Qdrant Cloud (Vector Database)**: We use **Qdrant Cloud** as our highly scalable Vector Database. It stores both the 384-dimensional vectors and the JSON payload (timestamps, titles). Qdrant is optimized for blazing-fast Approximate Nearest Neighbor (ANN) search, meaning it can instantly find the chunks most relevant to a user's question by calculating cosine distance.
+5. **Semantic Search & LLM (Gemini/Groq)**: When a user asks a question, it is vectorized and sent to Qdrant. The top matching chunks are retrieved and injected into a prompt. This prompt is sent to an advanced LLM (like Google Gemini 2.5 Flash or Groq Llama 3) to generate a conversational, accurate answer grounded *only* in the retrieved course data.
+6. **Streamlit**: The entire application, from the Upload Center to the AI Chat, is unified under a clean, responsive Streamlit frontend.
