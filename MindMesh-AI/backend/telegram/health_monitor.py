@@ -40,11 +40,11 @@ CPU: {cpu}%"""
 def send_daily_backup_status():
     """Check Qdrant backup / vectors status (mocked or actual query)."""
     # Assuming Qdrant client exists. We would normally inject it or import it.
-    from backend.qdrant_helper import get_qdrant_client
+    from backend.embeddings import get_qdrant_client
     try:
-        client, collection = get_qdrant_client()
+        client, error = get_qdrant_client()
         if client:
-            count_result = client.count(collection_name=collection)
+            count_result = client.count(collection_name=os.getenv('QDRANT_COLLECTION', 'mindmesh_courses'))
             vectors_count = count_result.count
             status = "Healthy"
         else:

@@ -4,8 +4,7 @@ from backend.telegram.bot import send_message
 from backend.telegram.analytics import AnalyticsStore
 import time
 from backend.llm_manager import generate_response
-from backend.embeddings import create_embedding
-from backend.qdrant_helper import get_qdrant_client
+from backend.embeddings import get_embedding_model, embed_single, get_qdrant_client
 from backend.retrieval import retrieve_from_qdrant, retrieve_from_joblib, build_rag_prompt
 
 # Store the application start time for /uptime
@@ -65,9 +64,9 @@ async def handle_ai_query(text: str, chat_id: str):
     """Processes RAG query via LLM Manager."""
     try:
         start_time = time.time()
-        # Mock retrieval for illustration (replace with real if running)
         q_client, _ = get_qdrant_client()
-        query_vector = create_embedding(text)
+        embed_model = get_embedding_model()
+        query_vector = embed_single(text, embed_model)
         
         if q_client:
             hits = retrieve_from_qdrant(q_client, query_vector)
