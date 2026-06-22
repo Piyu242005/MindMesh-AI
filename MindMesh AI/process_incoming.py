@@ -3,17 +3,14 @@ from sklearn.metrics.pairwise import cosine_similarity
 import numpy as np 
 import joblib 
 import requests
+from sentence_transformers import SentenceTransformer
 
+# Load the embedding model once (no Ollama required for embeddings)
+_model = SentenceTransformer("BAAI/bge-small-en-v1.5")
 
 def create_embedding(text_list):
-    # https://github.com/ollama/ollama/blob/main/docs/api.md#generate-embeddings
-    r = requests.post("http://localhost:11434/api/embed", json={
-        "model": "bge-m3",
-        "input": text_list
-    })
-
-    embedding = r.json()["embeddings"] 
-    return embedding
+    embeddings = _model.encode(text_list, show_progress_bar=False)
+    return embeddings.tolist()  # list of lists, same shape as Ollama response
 
 def inference(prompt):
     r = requests.post("http://localhost:11434/api/generate", json={

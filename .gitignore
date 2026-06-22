@@ -1,0 +1,71 @@
+# ── Large Binary / Media Files ──────────────────────────────────────────────
+*.zip
+*.mp3
+*.mp4
+*.webm
+*.mkv
+*.avi
+*.mov
+*.wav
+*.flac
+*.ogg
+*.jpg
+*.jpeg
+*.png
+*.gif
+*.bmp
+*.svg
+
+# ── ML Artifacts & Caches ────────────────────────────────────────────────────
+*.joblib
+*.pkl
+*.pickle
+*.h5
+*.hdf5
+*.ckpt
+*.pt
+*.pth
+__pycache__/
+*.py[cod]
+*.pyo
+.cache/
+.chroma/
+chroma_db/
+*.db
+*.sqlite
+*.sqlite3
+
+# ── Secrets & Environment Variables ─────────────────────────────────────────
+.env
+.env.*
+*.env
+secrets.json
+credentials.json
+*_api_key*
+*_secret*
+
+# ── Python / Virtual Environments ────────────────────────────────────────────
+venv/
+.venv/
+env/
+ENV/
+*.egg-info/
+dist/
+build/
+.eggs/
+site-packages/
+
+# ── OS / IDE Generated ───────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# ── Logs & Temp Files ────────────────────────────────────────────────────────
+*.log
+*.tmp
+*.temp
+logs/

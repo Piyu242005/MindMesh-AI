@@ -1,20 +1,17 @@
-import requests
 import os
 import json
 import numpy as np
 import pandas as pd
 from sklearn.metrics.pairwise import cosine_similarity
 import joblib
+from sentence_transformers import SentenceTransformer
+
+# Load the model once (no Ollama required)
+_model = SentenceTransformer("BAAI/bge-small-en-v1.5")
 
 def create_embedding(text_list):
-    # https://github.com/ollama/ollama/blob/main/docs/api.md#generate-embeddings
-    r = requests.post("http://localhost:11434/api/embed", json={
-        "model": "bge-m3",
-        "input": text_list
-    })
-
-    embedding = r.json()["embeddings"] 
-    return embedding
+    embeddings = _model.encode(text_list, show_progress_bar=False)
+    return embeddings.tolist()  # list of lists, same shape as before
 
 
 jsons = os.listdir("jsons")  # List all the jsons 
