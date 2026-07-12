@@ -10,6 +10,8 @@
 
 **Enterprise Video RAG & Autonomous Knowledge Base Platform**
 
+> The application source lives in `MindMesh-AI/`; run local Python commands from that directory.
+
 [![Typing SVG](https://readme-typing-svg.demolab.com?font=Inter&weight=600&size=20&pause=1000&color=8B5CF6&center=true&vCenter=true&width=800&lines=Transcribe+Videos+with+Faster-Whisper;Smart+Routing+Between+Top+LLMs;Production-Grade+AI+Architecture;Fast%2C+Accurate%2C+and+Cost-Effective)](https://git.io/typing-svg)
 
 [![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://python.org)
@@ -184,10 +186,15 @@ QDRANT_API_KEY=your_qdrant_api_key
 # Telegram Setup
 TELEGRAM_BOT_TOKEN=your_bot_token
 TELEGRAM_ADMIN_CHAT_ID=your_chat_id
+
+# Required for persistent browser sessions in production
+SESSION_SECRET=generate-a-long-random-value
+CORS_ORIGINS=http://localhost:8000
 ```
 
 ### 6. Run the Application
 ```bash
+cd MindMesh-AI
 python main.py
 ```
 Access the application at `http://localhost:8000`.

@@ -15,10 +15,10 @@ def create_conversation(user_id="local_user", title="New Conversation", folder=N
     conn.close()
     return conversation_id
 
-def get_conversation(conversation_id):
+def get_conversation(conversation_id, user_id="local_user"):
     conn = get_db_connection()
     cursor = conn.cursor()
-    cursor.execute("SELECT * FROM conversations WHERE id = ?", (conversation_id,))
+    cursor.execute("SELECT * FROM conversations WHERE id = ? AND user_id = ?", (conversation_id, user_id))
     conv = cursor.fetchone()
     conn.close()
     return dict(conv) if conv else None
@@ -49,46 +49,48 @@ def add_message(conversation_id, role, content, sources=None, confidence=None):
     conn.close()
     return msg_id
 
-def get_chat_history(conversation_id, limit=8):
+def get_chat_history(conversation_id, limit=8, user_id="local_user"):
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute(
-        "SELECT * FROM messages WHERE conversation_id = ? ORDER BY timestamp DESC LIMIT ?",
-        (conversation_id, limit)
+        """SELECT m.* FROM messages m JOIN conversations c ON c.id = m.conversation_id
+        WHERE m.conversation_id = ? AND c.user_id = ? ORDER BY m.timestamp DESC LIMIT ?""",
+        (conversation_id, user_id, limit)
     )
     messages = [dict(row) for row in cursor.fetchall()]
     conn.close()
     return messages[::-1] # Return in chronological order
 
-def get_full_chat_history(conversation_id):
+def get_full_chat_history(conversation_id, user_id="local_user"):
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute(
-        "SELECT * FROM messages WHERE conversation_id = ? ORDER BY timestamp ASC",
-        (conversation_id,)
+        """SELECT m.* FROM messages m JOIN conversations c ON c.id = m.conversation_id
+        WHERE m.conversation_id = ? AND c.user_id = ? ORDER BY m.timestamp ASC""",
+        (conversation_id, user_id)
     )
     messages = [dict(row) for row in cursor.fetchall()]
     conn.close()
     return messages
 
-def update_conversation_title(conversation_id, new_title):
+def update_conversation_title(conversation_id, new_title, user_id="local_user"):
     conn = get_db_connection()
     cursor = conn.cursor()
-    cursor.execute("UPDATE conversations SET title = ? WHERE id = ?", (new_title, conversation_id))
+    cursor.execute("UPDATE conversations SET title = ? WHERE id = ? AND user_id = ?", (new_title, conversation_id, user_id))
     conn.commit()
     conn.close()
 
-def update_conversation_summary(conversation_id, summary):
+def update_conversation_summary(conversation_id, summary, user_id="local_user"):
     conn = get_db_connection()
     cursor = conn.cursor()
-    cursor.execute("UPDATE conversations SET summary = ? WHERE id = ?", (summary, conversation_id))
+    cursor.execute("UPDATE conversations SET summary = ? WHERE id = ? AND user_id = ?", (summary, conversation_id, user_id))
     conn.commit()
     conn.close()
 
-def toggle_pin(conversation_id, is_pinned):
+def toggle_pin(conversation_id, is_pinned, user_id="local_user"):
     conn = get_db_connection()
     cursor = conn.cursor()
-    cursor.execute("UPDATE conversations SET is_pinned = ? WHERE id = ?", (int(is_pinned), conversation_id))
+    cursor.execute("UPDATE conversations SET is_pinned = ? WHERE id = ? AND user_id = ?", (int(is_pinned), conversation_id, user_id))
     conn.commit()
     conn.close()
 
@@ -99,10 +101,10 @@ def update_folder(conversation_id, folder):
     conn.commit()
     conn.close()
 
-def delete_conversation(conversation_id):
+def delete_conversation(conversation_id, user_id="local_user"):
     conn = get_db_connection()
     cursor = conn.cursor()
-    cursor.execute("DELETE FROM conversations WHERE id = ?", (conversation_id,))
+    cursor.execute("DELETE FROM conversations WHERE id = ? AND user_id = ?", (conversation_id, user_id))
     conn.commit()
     conn.close()
 

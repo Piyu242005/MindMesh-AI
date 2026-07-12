@@ -2,6 +2,7 @@ import os
 import sys
 import traceback
 import asyncio
+import secrets
 from pathlib import Path
 from contextlib import asynccontextmanager
 
@@ -9,14 +10,15 @@ from fastapi import FastAPI, Request
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.middleware.cors import CORSMiddleware
+from starlette.middleware.sessions import SessionMiddleware
 from dotenv import load_dotenv
 
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
-load_dotenv()
-
 # Setup paths
 ROOT = Path(__file__).parent
+load_dotenv(ROOT.parent / ".env")
+load_dotenv(ROOT / ".env")
 STATIC_DIR = ROOT / "static"
 TEMPLATES_DIR = ROOT / "templates"
 
@@ -57,9 +59,24 @@ async def lifespan(app: FastAPI):
 app = FastAPI(title="MindMesh AI", version="1.0", lifespan=lifespan)
 
 # ── Middlewares ────────────────────────────────────────────────────────────
+session_secret = os.getenv("SESSION_SECRET")
+if not session_secret:
+    session_secret = secrets.token_urlsafe(32)
+    print("WARNING: SESSION_SECRET is not set; existing sessions will reset after restart.")
+
+cors_origins = [origin.strip() for origin in os.getenv("CORS_ORIGINS", "http://localhost:8000").split(",") if origin.strip()]
+if "*" in cors_origins:
+    raise ValueError("CORS_ORIGINS cannot contain '*' when credentials are enabled.")
+
+app.add_middleware(
+    SessionMiddleware,
+    secret_key=session_secret,
+    https_only=os.getenv("SESSION_HTTPS_ONLY", "false").lower() == "true",
+    same_site="lax",
+)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=cors_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -112,6 +129,12 @@ app.include_router(settings.router)
 
 @app.post("/api/telegram/webhook")
 async def telegram_webhook(request: Request):
+    webhook_secret = os.getenv("TELEGRAM_WEBHOOK_SECRET", "")
+    if webhook_secret and not secrets.compare_digest(
+        request.headers.get("X-Telegram-Bot-Api-Secret-Token", ""), webhook_secret
+    ):
+        from fastapi import HTTPException
+        raise HTTPException(status_code=403, detail="Invalid Telegram webhook secret")
     try:
         data = await request.json()
         if "message" in data:

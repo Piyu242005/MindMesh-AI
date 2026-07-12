@@ -19,9 +19,9 @@ This guide covers deploying MindMesh-AI across various environments.
    pip install -r requirements.txt
    ```
 3. **Set up Environment Variables:**
-   Copy `.env.example` to `.env` and fill in your keys (Qdrant, Gemini, Groq).
+   Copy the repository-level `.env.example` to `.env` and fill in your keys (Qdrant, Gemini, Groq).
    ```bash
-   cp .env.example .env
+   cp ../.env.example ../.env
    ```
 4. **Run the App:**
    ```bash

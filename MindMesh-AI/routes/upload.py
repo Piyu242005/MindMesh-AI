@@ -2,7 +2,10 @@ from fastapi import APIRouter, Request, UploadFile, File, Form, BackgroundTasks
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
 from pathlib import Path
-import shutil
+import uuid
+
+MAX_UPLOAD_SIZE = 100 * 1024 * 1024
+ALLOWED_EXTENSIONS = {".mp3", ".mp4", ".m4a", ".mov", ".mkv", ".wav", ".webm"}
 
 router = APIRouter()
 
@@ -55,28 +58,43 @@ async def handle_upload(
     video_title: str = Form(...),
     file: UploadFile = File(...)
 ):
-    # 100MB check (naive approach: check content-length header if provided, 
-    # but for true security requires reading in chunks)
     content_length = request.headers.get("content-length")
-    if content_length and int(content_length) > 100 * 1024 * 1024:
-        return HTMLResponse("<div class='text-red-500'>File too large (Max 100MB)</div>", status_code=400)
+    if content_length:
+        try:
+            if int(content_length) > MAX_UPLOAD_SIZE:
+                return HTMLResponse("<div class='text-red-500'>File too large (Max 100MB)</div>", status_code=400)
+        except ValueError:
+            return HTMLResponse("<div class='text-red-500'>Invalid upload size.</div>", status_code=400)
         
     videos_dir = Path(__file__).parent.parent / "videos"
     videos_dir.mkdir(exist_ok=True)
     
-    safe_filename = file.filename.replace(" ", "_")
+    original_name = Path(file.filename or "upload").name
+    extension = Path(original_name).suffix.lower()
+    if extension not in ALLOWED_EXTENSIONS:
+        return HTMLResponse("<div class='text-red-500'>Unsupported file type.</div>", status_code=400)
+
+    safe_filename = f"{uuid.uuid4().hex}_{original_name.replace(' ', '_')}"
     file_path = videos_dir / safe_filename
-    
-    with open(file_path, "wb") as buffer:
-        shutil.copyfileobj(file.file, buffer)
+    bytes_written = 0
+    try:
+        with open(file_path, "wb") as buffer:
+            while chunk := await file.read(1024 * 1024):
+                bytes_written += len(chunk)
+                if bytes_written > MAX_UPLOAD_SIZE:
+                    buffer.close()
+                    file_path.unlink(missing_ok=True)
+                    return HTMLResponse("<div class='text-red-500'>File too large (Max 100MB)</div>", status_code=400)
+                buffer.write(chunk)
+    finally:
+        await file.close()
         
     background_tasks.add_task(process_upload_task, file_path, video_number, video_title)
     
     # Telegram Alert
     from backend.telegram.notifications import send_upload_alert
     from backend.telegram.analytics import AnalyticsStore
-    size_mb = 0 if not content_length else int(content_length) / (1024 * 1024)
-    send_upload_alert(file.filename, size_mb)
+    send_upload_alert(original_name, bytes_written / (1024 * 1024))
     AnalyticsStore.add_upload()
     
     return HTMLResponse(

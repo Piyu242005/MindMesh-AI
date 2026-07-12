@@ -8,6 +8,7 @@ import json
 from backend import qdrant_helper as qh
 from backend.embeddings import get_embedding_model, get_qdrant_client
 from backend.retrieval import retrieve, build_rag_prompt, rewrite_query
+from backend.session import get_current_user_id
 
 from cachetools import TTLCache
 
@@ -17,6 +18,10 @@ response_cache = TTLCache(maxsize=1000, ttl=86400)
 router = APIRouter()
 TEMPLATES_DIR = Path(__file__).parent.parent / "templates"
 templates = Jinja2Templates(directory=str(TEMPLATES_DIR))
+
+
+def sse_event(payload: dict) -> str:
+    return f"data: {json.dumps(payload)}\n\n"
 
 @router.get("/chat")
 async def chat_page(request: Request):
@@ -30,7 +35,7 @@ def chat_endpoint(request: Request, query: str = Form(...), conversation_id: str
         import traceback
         traceback.print_exc()
         def err_gen():
-            yield f"data: Sorry, an error occurred.<br><br><small>{str(e)}</small>\n\n"
+            yield sse_event({"error": "Sorry, an error occurred while processing your request."})
         return StreamingResponse(err_gen(), media_type="text/event-stream")
 
 def _chat_endpoint_internal(request: Request, query: str, conversation_id: str):
@@ -39,15 +44,19 @@ def _chat_endpoint_internal(request: Request, query: str, conversation_id: str):
         generate_conversation_title, update_conversation_title,
         get_conversation, generate_conversation_summary, update_conversation_summary
     )
+    user_id = get_current_user_id(request)
+    query = query.strip()
+    if not query:
+        def err_gen():
+            yield sse_event({"error": "Please enter a question."})
+        return StreamingResponse(err_gen(), media_type="text/event-stream", status_code=400)
 
     # Check cache first ONLY if there is no active conversation context
     if not conversation_id and query in response_cache:
         cached_response, conf = response_cache[query]
         def cached_sse_generator():
-            conf_icon = "🟢" if conf == "High" else "🟡" if conf == "Medium" else "🔴"
-            conf_html = f"<div class='text-sm mb-4 font-semibold text-gray-300'>{conf_icon} Confidence: {conf}</div>"
-            yield f"data: {conf_html}\n\n"
-            yield f"data: {cached_response.replace('\n', '<br>')}\n\n"
+            yield sse_event({"confidence": conf})
+            yield sse_event({"content": cached_response})
         return StreamingResponse(cached_sse_generator(), media_type="text/event-stream")
 
     chat_history = []
@@ -55,11 +64,15 @@ def _chat_endpoint_internal(request: Request, query: str, conversation_id: str):
     is_new = False
     
     if not conversation_id or conversation_id.strip() == "":
-        conversation_id = create_conversation(title="New Conversation")
+        conversation_id = create_conversation(user_id=user_id, title="New Conversation")
         is_new = True
     else:
-        chat_history = get_chat_history(conversation_id, limit=8)
-        conv = get_conversation(conversation_id)
+        chat_history = get_chat_history(conversation_id, user_id=user_id, limit=8)
+        conv = get_conversation(conversation_id, user_id=user_id)
+        if not conv:
+            def err_gen():
+                yield sse_event({"error": "Conversation not found."})
+            return StreamingResponse(err_gen(), media_type="text/event-stream", status_code=404)
         if conv and conv.get("summary"):
             summary = conv["summary"]
 
@@ -110,16 +123,12 @@ def _chat_endpoint_internal(request: Request, query: str, conversation_id: str):
     
     # Synchronous generator allows Starlette to safely offload blocking next() to threadpool
     def sse_generator():
-        conf_icon = "🟢" if confidence == "High" else "🟡" if confidence == "Medium" else "🔴"
-        conf_html = f"<div class='text-sm mb-4 font-semibold text-gray-300'>{conf_icon} Confidence: {confidence}</div>"
-        
-        yield f"data: {conf_html}\n\n"
+        yield sse_event({"confidence": confidence})
         
         full_response = ""
         for chunk in stream_gen:
             full_response += chunk
-            safe_chunk = chunk.replace('\n', '<br>')
-            yield f"data: {safe_chunk}\n\n"
+            yield sse_event({"content": chunk})
             
         # Store the completed response in the cache ONLY if standalone
         if is_new:
@@ -131,62 +140,65 @@ def _chat_endpoint_internal(request: Request, query: str, conversation_id: str):
         # Background Tasks (Title & Summary)
         if is_new:
             title = generate_conversation_title(query)
-            update_conversation_title(conversation_id, title)
+            update_conversation_title(conversation_id, title, user_id=user_id)
             
         # Generate summary every 20 messages (approx. 10 pairs)
         if len(chat_history) >= 18 and len(chat_history) % 10 == 0:
             from backend.memory import get_full_chat_history
-            full_history = get_full_chat_history(conversation_id)
+            full_history = get_full_chat_history(conversation_id, user_id=user_id)
             new_summary = generate_conversation_summary(full_history)
-            update_conversation_summary(conversation_id, new_summary)
+            update_conversation_summary(conversation_id, new_summary, user_id=user_id)
             
     return StreamingResponse(sse_generator(), media_type="text/event-stream", headers={"X-Conversation-Id": conversation_id})
 
 @router.get("/api/conversations")
-def list_conversations():
+def list_conversations(request: Request):
     from backend.memory import get_all_conversations
-    return {"conversations": get_all_conversations()}
+    return {"conversations": get_all_conversations(get_current_user_id(request))}
 
 @router.get("/api/conversations/search")
-def search_conversations_endpoint(q: str):
+def search_conversations_endpoint(request: Request, q: str):
     from backend.memory import search_conversations
-    return {"conversations": search_conversations(q)}
+    return {"conversations": search_conversations(q, get_current_user_id(request))}
 
 @router.get("/api/conversations/{conversation_id}")
-def get_conversation_data(conversation_id: str):
+def get_conversation_data(request: Request, conversation_id: str):
     from backend.memory import get_conversation, get_full_chat_history
-    conv = get_conversation(conversation_id)
+    user_id = get_current_user_id(request)
+    conv = get_conversation(conversation_id, user_id=user_id)
     if not conv:
         return {"error": "Not found"}
-    messages = get_full_chat_history(conversation_id)
+    messages = get_full_chat_history(conversation_id, user_id=user_id)
     return {"conversation": conv, "messages": messages}
 
 @router.delete("/api/conversations/{conversation_id}")
-def delete_conv(conversation_id: str):
+def delete_conv(request: Request, conversation_id: str):
     from backend.memory import delete_conversation
-    delete_conversation(conversation_id)
+    delete_conversation(conversation_id, user_id=get_current_user_id(request))
     return {"status": "deleted"}
 
 @router.patch("/api/conversations/{conversation_id}")
-def update_conv(conversation_id: str, title: str = Form(None), is_pinned: int = Form(None)):
+def update_conv(request: Request, conversation_id: str, title: str = Form(None), is_pinned: int = Form(None)):
     from backend.memory import update_conversation_title, toggle_pin
+    user_id = get_current_user_id(request)
     if title is not None:
-        update_conversation_title(conversation_id, title)
+        update_conversation_title(conversation_id, title, user_id=user_id)
     if is_pinned is not None:
-        toggle_pin(conversation_id, is_pinned)
+        toggle_pin(conversation_id, is_pinned, user_id=user_id)
     return {"status": "updated"}
 
 @router.get("/api/conversations/{conversation_id}/export/{format}")
-def export_conversation(conversation_id: str, format: str):
+def export_conversation(request: Request, conversation_id: str, format: str):
     from backend.memory import get_conversation, get_full_chat_history
     from fastapi.responses import PlainTextResponse
     import json
     
-    conv = get_conversation(conversation_id)
+    user_id = get_current_user_id(request)
+    conv = get_conversation(conversation_id, user_id=user_id)
     if not conv:
         return {"error": "Not found"}
         
-    messages = get_full_chat_history(conversation_id)
+    messages = get_full_chat_history(conversation_id, user_id=user_id)
     title = conv.get("title", "Export")
     
     if format == "json":

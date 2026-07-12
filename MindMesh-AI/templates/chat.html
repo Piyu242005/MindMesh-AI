@@ -43,6 +43,28 @@
 <script>
     let currentConversationId = new URLSearchParams(window.location.search).get('id');
 
+    function escapeHtml(value) {
+        const element = document.createElement('div');
+        element.textContent = value;
+        return element.innerHTML;
+    }
+
+    function appendText(container, value) {
+        const lines = value.split('\n');
+        lines.forEach((line, index) => {
+            if (index) container.appendChild(document.createElement('br'));
+            container.appendChild(document.createTextNode(line));
+        });
+    }
+
+    function appendConfidence(container, confidence) {
+        const icons = { High: '🟢', Medium: '🟡', Low: '🔴' };
+        const label = document.createElement('div');
+        label.className = 'text-sm mb-4 font-semibold text-gray-300';
+        label.textContent = `${icons[confidence] || '⚪'} Confidence: ${confidence}`;
+        container.appendChild(label);
+    }
+
     async function loadChatHistory() {
         if (!currentConversationId) return;
         
@@ -68,7 +90,7 @@
                     messages.insertAdjacentHTML('beforeend', `
                         <div class="flex gap-4 justify-end">
                             <div class="bg-accent/20 rounded-2xl rounded-tr-none p-4 text-white border border-accent/20 max-w-[80%]">
-                                ${msg.content}
+                                ${escapeHtml(msg.content)}
                             </div>
                             <div class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center flex-shrink-0 text-xl">👤</div>
                         </div>
@@ -77,14 +99,14 @@
                     let confHtml = '';
                     if (msg.confidence) {
                         const icon = msg.confidence === 'High' ? '🟢' : msg.confidence === 'Medium' ? '🟡' : '🔴';
-                        confHtml = `<div class='text-sm mb-4 font-semibold text-gray-300'>${icon} Confidence: ${msg.confidence}</div>`;
+                        confHtml = `<div class='text-sm mb-4 font-semibold text-gray-300'>${icon} Confidence: ${escapeHtml(msg.confidence)}</div>`;
                     }
                     messages.insertAdjacentHTML('beforeend', `
                         <div class="flex gap-4">
                             <img src="/assets/logo.png" alt="AI Avatar" class="w-10 h-10 rounded-full bg-accent/10 border border-accent/20 object-contain p-1 flex-shrink-0">
                             <div class="bg-white/5 rounded-2xl rounded-tl-none p-4 text-gray-200 border border-white/5 min-w-[100px] prose prose-invert max-w-none">
                                 ${confHtml}
-                                ${msg.content.replace(/\n/g, '<br>')}
+                                ${escapeHtml(msg.content).replace(/\n/g, '<br>')}
                             </div>
                         </div>
                     `);
@@ -128,7 +150,7 @@
         const userHtml = `
             <div class="flex gap-4 justify-end">
                 <div class="bg-accent/20 rounded-2xl rounded-tr-none p-4 text-white border border-accent/20 max-w-[80%]">
-                    ${query}
+                    ${escapeHtml(query)}
                 </div>
                 <div class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center flex-shrink-0 text-xl">👤</div>
             </div>
@@ -196,8 +218,14 @@
                     const lines = chunk.split('\n');
                     lines.forEach(line => {
                         if (line.startsWith('data: ')) {
-                            const data = line.substring(6);
-                            tempResponse.innerHTML += data;
+                            try {
+                                const event = JSON.parse(line.substring(6));
+                                if (event.confidence) appendConfidence(tempResponse, event.confidence);
+                                if (event.content) appendText(tempResponse, event.content);
+                                if (event.error) appendText(tempResponse, event.error);
+                            } catch (error) {
+                                console.error('Invalid chat stream event', error);
+                            }
                             messages.scrollTop = messages.scrollHeight;
                         }
                     });

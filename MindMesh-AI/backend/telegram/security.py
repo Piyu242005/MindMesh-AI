@@ -12,7 +12,7 @@ class SecurityMonitoringMiddleware(BaseHTTPMiddleware):
         self.TIME_WINDOW = 60 # seconds
 
     async def dispatch(self, request: Request, call_next):
-        client_ip = request.client.host
+        client_ip = request.client.host if request.client else "unknown"
         now = time.time()
         
         # Clean up old requests
@@ -31,6 +31,8 @@ Rate Limit Exceeded
 Count:
 {len(self.ip_requests[client_ip])} Requests in 1 Minute"""
             send_message(msg)
+            from fastapi.responses import JSONResponse
+            return JSONResponse({"detail": "Rate limit exceeded"}, status_code=429)
 
         try:
             response = await call_next(request)
