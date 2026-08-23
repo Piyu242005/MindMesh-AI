@@ -1,220 +1,119 @@
-<div align="center">
-  <img src="MindMesh-AI/assets/logo.png" width="180">
+# 🧠 MindMesh AI
 
-  <h1>MindMesh AI</h1>
+### Enterprise Video RAG & AI Knowledge Base
 
-  <p>
-    Transform Video Courses into Intelligent Knowledge Networks
-  </p>
-</div>
+MindMesh AI transforms educational videos and courses into a searchable knowledge base. It combines **Faster-Whisper transcription, semantic embeddings, Qdrant vector search, RAG and multi-LLM generation** to answer questions with source timestamps.
 
-**Enterprise Video RAG & Autonomous Knowledge Base Platform**
+> **Purpose:** I created MindMesh AI to solve a practical learning problem: turning long video courses into an interactive knowledge system where users can ask questions instead of manually searching hours of video.
 
-> The application source lives in `MindMesh-AI/`; run local Python commands from that directory.
+## ✨ Core Features
 
-[![Typing SVG](https://readme-typing-svg.demolab.com?font=Inter&weight=600&size=20&pause=1000&color=8B5CF6&center=true&vCenter=true&width=800&lines=Transcribe+Videos+with+Faster-Whisper;Smart+Routing+Between+Top+LLMs;Production-Grade+AI+Architecture;Fast%2C+Accurate%2C+and+Cost-Effective)](https://git.io/typing-svg)
+| Feature | Purpose |
+|---|---|
+| 🎙️ Faster-Whisper | Converts video/audio into searchable transcripts |
+| 🧩 Chunking + Embeddings | Converts transcript content into retrieval-ready knowledge |
+| 🔎 Qdrant | Performs semantic vector search |
+| 🤖 Multi-LLM | Uses Gemini/Groq with provider fallback |
+| ⏱️ Timestamp Answers | Links answers back to source-video locations |
+| 📊 Analytics | Tracks application activity and system health |
+| 📡 Telegram | Optional operational alerts and telemetry |
+| 🐳 Docker/Kubernetes | Containerized deployment architecture |
 
-[![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://python.org)
-[![FastAPI](https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
-[![Qdrant](https://img.shields.io/badge/Qdrant-000000?style=for-the-badge&logo=qdrant&logoColor=white)](https://qdrant.tech/)
-[![Kubernetes](https://img.shields.io/badge/Kubernetes-326CE5?style=for-the-badge&logo=kubernetes&logoColor=white)](https://kubernetes.io)
-[![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://docker.com)
-[![Gemini](https://img.shields.io/badge/Google%20Gemini-4285F4?style=for-the-badge&logo=google&logoColor=white)](https://ai.google.dev/)
-[![Groq](https://img.shields.io/badge/Groq-F55036?style=for-the-badge&logo=groq&logoColor=white)](https://groq.com)
-<br>
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](https://opensource.org/licenses/MIT)
-[![Stars](https://img.shields.io/github/stars/Piyu242005/MindMesh-AI?style=flat-square)](https://github.com/Piyu242005/MindMesh-AI/stargazers)
-[![Forks](https://img.shields.io/github/forks/Piyu242005/MindMesh-AI?style=flat-square)](https://github.com/Piyu242005/MindMesh-AI/network/members)
-
-</div>
-
-<br/>
-
-## 📝 Overview
-
-**MindMesh AI** is a production-grade enterprise application that transforms raw educational videos and courses into a deeply searchable, interactive AI knowledge base. Rebuilt from the ground up on **FastAPI**, **HTMX**, and **Tailwind CSS**, it brings bleeding-edge responsiveness while dropping frontend bloat.
-
-By orchestrating intelligent routing between Google Gemini 2.5 Flash and Groq's LLaMA 3.3, coupled with **Qdrant Cloud** and **Faster-Whisper** offline transcription, MindMesh AI delivers highly scalable, context-aware answers directly linked to exact video timestamps. The system is hardened for production with **Docker**, **Kubernetes (K8s)** manifests, and a fully integrated **Telegram Ecosystem** for active system monitoring.
-
----
-
-## 📸 Screenshots
-
-![Modern Dashboard](MindMesh-AI/assets/DASHBOARD.png)
-<br>
-![Chat Interface](MindMesh-AI/assets/AI%20REPSONSE.png)
-
----
-
-## 🌐 Live Demo
-
-*(Insert Live URL Here once deployed)*
-
----
-
-## ✨ Features
-
-| Feature | Description |
-| :--- | :--- |
-| ⚡ **Faster-Whisper Transcription** | Transcribes video courses at incredible speeds with GPU acceleration via CTranslate2. |
-| 🔀 **Multi-LLM Gateway** | Unified interface combining models from Google Gemini and Groq with seamless failover. |
-| 🛡️ **Automatic Fallback System** | Seamlessly reroutes failed API requests (e.g., 429 Quota limits) to backup providers. |
-| 📱 **Telegram Ecosystem** | Real-time alerts for server health, application errors, daily analytics, and CI/CD deployment status pushed directly to your phone. |
-| 🌐 **Qdrant Cloud Integration** | High-performance semantic vector search completely removing local memory bottlenecks. |
-| ⏱️ **Timestamp Deep Linking** | AI answers include precise timestamps tracing back to the exact moment in the source video. |
-| 📊 **Advanced Analytics Dashboard** | Real-time telemetry tracking total requests, uploads, Qdrant vectors, and System Health. |
-| 🎨 **Premium UI/UX** | Glassmorphism styling, dark-mode, first-time user onboarding modal, and snappy HTMX interactions. |
-
----
-
-## 🏗️ Architecture Diagram
+## 🏗️ Architecture
 
 ```mermaid
 graph TD
-    %% Styling
-    classDef user fill:#6366f1,stroke:#4f46e5,stroke-width:2px,color:#fff,rx:8px,ry:8px;
-    classDef media fill:#8b5cf6,stroke:#7c3aed,stroke-width:2px,color:#fff,rx:8px,ry:8px;
-    classDef embed fill:#10b981,stroke:#059669,stroke-width:2px,color:#fff,rx:8px,ry:8px;
-    classDef vector fill:#f59e0b,stroke:#d97706,stroke-width:2px,color:#fff,rx:8px,ry:8px;
-    classDef llm fill:#3b82f6,stroke:#2563eb,stroke-width:2px,color:#fff,rx:8px,ry:8px;
-    classDef devops fill:#e11d48,stroke:#be123c,stroke-width:2px,color:#fff,rx:8px,ry:8px;
-    
-    U(("👤 User Upload")):::user -->|"Uploads Video"| UI["🖥️ FastAPI + HTMX"]:::user
-    UI -->|"FFmpeg Audio Extraction"| EXT["🎵 MP3 Extractor"]:::media
-    EXT -->|"Faster-Whisper (CTranslate2)"| TX["🗣️ Transcription Engine"]:::media
-    
-    TX -->|"Chunking JSON"| C["📄 Data Chunker"]:::media
-    C -->|"SentenceTransformers (BGE-Small)"| EMB["💡 Embedding Generation"]:::embed
-    
-    EMB -->|"Upsert Vectors"| Q["☁️ Qdrant Cloud Cluster"]:::vector
-    
-    UI -->|"User Chat Query"| QRY["❓ User Query"]:::user
-    QRY -->|"Semantic Search"| Q
-    
-    Q -->|"Retrieved Context"| LLMG["⚡ LLM Manager Gateway"]:::llm
-    
-    LLMG -.->|"Primary"| GEM["🔵 Gemini 2.5 Flash"]:::llm
-    LLMG -.->|"Fallback"| GRQ["🟠 Groq LLaMA 3.3"]:::llm
-    
-    Health["⏱️ APScheduler"]:::devops -->|"System Monitors"| TG["📱 Telegram Ecosystem"]:::devops
-    LLMG -->|"Query Analytics"| TG
+    U[User] --> UI[FastAPI + HTMX]
+    UI --> F[FFmpeg]
+    F --> W[Faster-Whisper]
+    W --> C[Transcript Chunking]
+    C --> E[BGE Embeddings]
+    E --> Q[(Qdrant Cloud)]
+    UI --> R[User Query]
+    R --> Q
+    Q --> CTX[Retrieved Context]
+    CTX --> L[LLM Gateway]
+    L --> G[Gemini]
+    L --> GR[Groq]
 ```
 
----
+## 🔄 How It Works
 
-## 💻 Tech Stack
+1. Upload a video/course.
+2. Extract audio with FFmpeg.
+3. Transcribe with Faster-Whisper.
+4. Chunk the transcript and generate embeddings.
+5. Store vectors in Qdrant.
+6. Retrieve relevant chunks for each query.
+7. Generate an answer using the configured LLM.
+8. Return contextual information and timestamps.
 
-<div align="center">
+## 🛠️ Stack
 
-| Layer | Technologies |
-| :--- | :--- |
-| **Frontend** | ![FastAPI](https://img.shields.io/badge/FastAPI-009688?style=flat-square&logo=fastapi&logoColor=white) `HTMX`, `Tailwind CSS`, `Jinja2` |
-| **Backend Core** | ![Python](https://img.shields.io/badge/Python_3.11-3776AB?style=flat-square&logo=python&logoColor=white) `APScheduler`, `python-telegram-bot` |
-| **AI Models** | ![Gemini](https://img.shields.io/badge/Gemini_2.5_Flash-4285F4?style=flat-square&logo=google&logoColor=white) ![Groq](https://img.shields.io/badge/Groq_LLaMA_3.3-F55036?style=flat-square&logo=groq&logoColor=white) |
-| **Data & Vectors** | ![Qdrant](https://img.shields.io/badge/Qdrant_Cloud-000000?style=flat-square&logo=qdrant&logoColor=white) ![SentenceTransformers](https://img.shields.io/badge/Sentence_Transformers-FFD21E?style=flat-square) |
-| **DevOps & Infra**| ![Docker](https://img.shields.io/badge/Docker-2496ED?style=flat-square&logo=docker&logoColor=white) ![Kubernetes](https://img.shields.io/badge/Kubernetes-326CE5?style=flat-square&logo=kubernetes&logoColor=white) `GitHub Actions` |
+**Python 3.11 · FastAPI · HTMX · Tailwind CSS · Faster-Whisper · SentenceTransformers · Qdrant Cloud · Gemini · Groq · Docker · Kubernetes · GitHub Actions**
 
-</div>
+## 🚀 Run Locally
 
----
-
-## 🗺️ Roadmap
-
-- [x] Streamlit to FastAPI + HTMX Migration
-- [x] Containerize Application (Docker multi-stage build)
-- [x] Integrate Kubernetes Manifests for Production K8s Deployment
-- [x] Telegram Operations & Alerts Ecosystem
-- [x] Implement First-time User Onboarding
-- [ ] Add User Authentication (OAuth/JWT)
-- [ ] Setup Persistent Database for user profiles
-- [ ] YouTube Video URL Parsing & Downloading
-
----
-
-## 🚀 Deployment
-
-MindMesh AI is fully containerized and production-ready for Kubernetes. 
-
-See the dedicated documentation for detailed deployment instructions:
-- [Docker Deployment Guide](DEPLOYMENT.md)
-- [Kubernetes Setup Guide](KUBERNETES.md)
-- [Telegram Ecosystem Setup](TELEGRAM_SETUP.md)
-
-### Quick Docker Run
-```bash
-docker build -t mindmesh-ai .
-docker run -d -p 8000:8000 --env-file .env mindmesh-ai
-```
-
----
-
-## ⚙️ Local Installation & Usage
-
-### 1. Clone the Repository
 ```bash
 git clone https://github.com/Piyu242005/MindMesh-AI.git
 cd MindMesh-AI
-```
-
-### 2. Set up a Virtual Environment
-```bash
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-```
-
-### 3. Install System Dependencies
-Install [FFmpeg](https://ffmpeg.org/download.html) and ensure it is added to your system `PATH`.
-
-### 4. Install Python Dependencies
-```bash
+python -m venv .venv
+# Windows: .venv\Scripts\activate
+# macOS/Linux: source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-### 5. Configure Environment Variables
-Create a `.env` file in the root directory (using `.env.example` as a template):
+Install **FFmpeg** and make sure it is available on `PATH`.
+
+Configure `.env` using `.env.example`:
+
 ```env
-# Google Gemini API
-GEMINI_API_KEY=your_gemini_key
-
-# Groq API
-GROQ_API_KEY=your_groq_key
-
-# Qdrant Cloud
-QDRANT_URL=your_qdrant_cluster_url
-QDRANT_API_KEY=your_qdrant_api_key
-
-# Telegram Setup
-TELEGRAM_BOT_TOKEN=your_bot_token
-TELEGRAM_ADMIN_CHAT_ID=your_chat_id
-
-# Required for persistent browser sessions in production
-SESSION_SECRET=generate-a-long-random-value
-CORS_ORIGINS=http://localhost:8000
+GEMINI_API_KEY=your_key
+GROQ_API_KEY=your_key
+QDRANT_URL=your_qdrant_url
+QDRANT_API_KEY=your_qdrant_key
+SESSION_SECRET=your_random_secret
 ```
 
-### 6. Run the Application
+Start:
+
 ```bash
-cd MindMesh-AI
 python main.py
 ```
-Access the application at `http://localhost:8000`.
 
----
+## 🐳 Deployment
+
+Docker and Kubernetes deployment configurations are included. Before real production deployment, configure secrets, storage, authentication and the target cluster environment.
+
+```bash
+docker build -t mindmesh-ai .
+docker run -p 8000:8000 --env-file .env mindmesh-ai
+```
+
+## 📸 Screenshots
+
+![Dashboard](MindMesh-AI/assets/DASHBOARD.png)
+
+![AI Response](MindMesh-AI/assets/AI%20REPSONSE.png)
+
+## 🗺️ Roadmap
+
+- [x] FastAPI + HTMX architecture
+- [x] Faster-Whisper transcription
+- [x] Qdrant semantic retrieval
+- [x] Multi-LLM fallback
+- [x] Docker/Kubernetes configuration
+- [ ] OAuth/JWT authentication
+- [ ] Persistent user database
+- [ ] YouTube URL ingestion
+- [ ] Retrieval/answer evaluation suite
+
+## 📌 Status
+
+**Active development.** Infrastructure is production-oriented, while authentication and persistent user management remain roadmap items.
 
 ## 👨‍💻 Author
 
-### **Piyush Ramteke**
-**Data Scientist | AI Engineer | Python Developer**
+**Piyush Ramteke** — Data Scientist | AI Engineer | Python Developer
 
-*Passionate about building scalable AI systems, Generative AI applications, and elegant data solutions.*
-
-[![GitHub](https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Piyu242005)
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white)](https://linkedin.com/in/piyush-ramteke)
-[![Hugging Face](https://img.shields.io/badge/Hugging_Face-FFD21E?style=for-the-badge&logo=huggingface&logoColor=black)](https://huggingface.co/Piyu242005)
-[![Portfolio](https://img.shields.io/badge/Portfolio-8B5CF6?style=for-the-badge&logo=vercel&logoColor=white)](https://piyushramteke.dev)
-
----
-
-<div align="center">
-  <sub>Built with ❤️ using FastAPI, HTMX, and modern Generative AI.</sub>
-</div>
+GitHub: https://github.com/Piyu242005
