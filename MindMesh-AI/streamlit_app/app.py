@@ -1,5 +1,6 @@
 """MindMesh AI Streamlit app backed by Supabase pgvector."""
 from __future__ import annotations
+import base64
 import hashlib
 import os
 import subprocess
@@ -136,8 +137,20 @@ def llm(question: str, context: list[dict], history: list[dict]) -> str:
     raise RuntimeError("Configure GROQ_API_KEY or GEMINI_API_KEY.")
 
 
+def _logo_b64(path: Path) -> str:
+    return base64.b64encode(path.read_bytes()).decode()
+
+
 def main():
-    st.set_page_config(page_title="MindMesh AI", page_icon="🧠", layout="wide")
+    _here = Path(__file__).resolve().parent
+    _icon_path = _here / "PIYU-AppIcon-180x180.png"
+    _logo_path = _here / "PIYU-icon-violet_512x512.png"
+
+    st.set_page_config(
+        page_title="MindMesh AI",
+        page_icon=str(_icon_path) if _icon_path.exists() else "🧠",
+        layout="wide",
+    )
 
     # MindMesh brand: RED + BLACK only.
     st.markdown("""
@@ -177,14 +190,41 @@ def main():
     </style>
     """, unsafe_allow_html=True)
 
-    st.markdown("<h1 style='color:#ff1a1a;margin-bottom:0'>🧠 MindMesh AI</h1>", unsafe_allow_html=True)
+    # Header with PIYU logo
+    if _logo_path.exists():
+        _logo_b64_str = _logo_b64(_logo_path)
+        st.markdown(
+            f"""
+            <div style='display:flex;align-items:center;gap:14px;margin-bottom:2px'>
+                <img src='data:image/png;base64,{_logo_b64_str}'
+                     style='height:52px;width:52px;border-radius:12px;flex-shrink:0' />
+                <h1 style='color:#ff1a1a;margin:0;line-height:1'>MindMesh AI</h1>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+    else:
+        st.markdown("<h1 style='color:#ff1a1a;margin-bottom:0'>🧠 MindMesh AI</h1>", unsafe_allow_html=True)
     st.caption("AI knowledge workspace powered by Supabase pgvector")
     connected = bool(sb_url() and sb_key())
     if not connected:
         st.warning("Configure SUPABASE_URL and SUPABASE_KEY in Streamlit secrets.")
 
     with st.sidebar:
-        st.markdown("<h2 style='color:#ff1a1a'>MindMesh</h2>", unsafe_allow_html=True)
+        if _icon_path.exists():
+            _icon_b64_str = _logo_b64(_icon_path)
+            st.markdown(
+                f"""
+                <div style='display:flex;align-items:center;gap:10px;margin-bottom:8px'>
+                    <img src='data:image/png;base64,{_icon_b64_str}'
+                         style='height:36px;width:36px;border-radius:8px;flex-shrink:0' />
+                    <span style='color:#ff1a1a;font-size:1.25rem;font-weight:700'>MindMesh</span>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+        else:
+            st.markdown("<h2 style='color:#ff1a1a'>MindMesh</h2>", unsafe_allow_html=True)
         st.header("Knowledge Base")
         upload = st.file_uploader("Add content", type=["pdf", "txt", "md", "csv", "mp3", "wav", "m4a", "mp4", "mov", "mkv", "webm"])
         if upload and st.button("⚡ Process & Index", disabled=not connected, use_container_width=True):
